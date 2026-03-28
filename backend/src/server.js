@@ -85,6 +85,3 @@ mongoose.connect(process.env.MONGO_URI)
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-//# Google OAuth (authRoutes.js)- these belongs in the .env though i have temporarilly commented out, i will check out its setup procedure
-// GOOGLE_CLIENT_ID=your_google_oauth_client_id_from_console
-// GOOGLE_CLIENT_SECRET=your_google_oauth_client_secret
