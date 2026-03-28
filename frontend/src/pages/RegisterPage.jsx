@@ -26,25 +26,15 @@ const RegisterPage = () => {
   };
 
   const handleSendOtp = async () => {
-  const passwordError = getPasswordError(form.password);
-  if (passwordError) {
-    toast.error(passwordError);
-    return;
-  }
-
-  try {
-    await axios.post(`${process.env.REACT_APP_API_URL}/otp/send-email-otp`, { email: form.email });
-    toast.success('OTP sent to your email');
-    // ⏳ Wait briefly to ensure toast shows
-    setTimeout(() => setStep(2), 300);
-  } catch (err) {
-    if (err.response?.data?.error) {
-      toast.error(err.response.data.error);  // e.g., "Email already exists"
-    } else {
-      toast.error('Failed to send OTP');
+    toast.success('Demo: Direct register (OTP skipped for testing)');
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, form);
+      toast.success('Registration successful!');
+      setTimeout(() => navigate('/login'), 2000);
+    } catch (err) {
+      toast.error(err.response?.data?.error || err.message || 'Registration failed');
     }
-  }
-};
+  };
 
   const handleVerifyOtp = async () => {
   try {
@@ -130,9 +120,7 @@ const RegisterPage = () => {
               </span>
             </div>
 
-            {form.password && getPasswordError(form.password) && (
-              <p className="text-sm text-red-600 dark:text-red-400">{getPasswordError(form.password)}</p>
-            )}
+            {/* Password validation disabled for testing - any password works */}
 
             <select
               value={form.role}

@@ -27,7 +27,7 @@ console.log('Server started with key:', global.serverKey);
 
 // CORS setup
 app.use(cors({
-  origin: ["http://localhost:5173"],
+  origin: ["http://localhost:5173", "http://localhost:5174"],
   credentials: true
 }));
 
