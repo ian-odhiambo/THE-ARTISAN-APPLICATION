@@ -11,70 +11,37 @@ const RegisterPage = () => {
     role: 'customer'
   });
 
-  const [step, setStep] = useState(1);
-  const [otp, setOtp] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const getPasswordError = (password) => {
     if (password.length < 8) return 'Password must be at least 8 characters.';
     if (!/[A-Z]/.test(password)) return 'Password must include at least one uppercase letter.';
     if (!/[a-z]/.test(password)) return 'Password must include at least one lowercase letter.';
-    if (!/\d/.test(password)) return 'Password must include at least one number.';
-    if (!/[\W_]/.test(password)) return 'Password must include at least one special character.';
+if (!/\d/.test(password)) return 'Password must include at least one number.';
+if (!/[\W_]/.test(password)) return 'Password must include at least one special character.';
     return '';
   };
 
-  const handleSendOtp = async () => {
+  const handleRegister = async (e) => {
+    e.preventDefault();
     const passwordError = getPasswordError(form.password);
     if (passwordError) {
       toast.error(passwordError);
       return;
     }
 
+    setLoading(true);
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/otp/send-email-otp`, { email: form.email });
-      toast.success('OTP sent to your email');
-      setTimeout(() => setStep(2), 300);
+await axios.post('http://localhost:5000/api/v1/auth/register', form);
+      toast.success('Registration successful!');
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
-      if (err.response?.data?.error) {
-        toast.error(err.response.data.error);
-      } else {
-        toast.error('Failed to send OTP');
-      }
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/otp/verify-email-otp`, {
-        email: form.email,
-        otp
-      });
-
-      if (res.data.verified) {
-        await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, form);
-        toast.success('Registration successful!');
-        setTimeout(() => navigate('/login'), 2000);
-      } else {
-        toast.error('Invalid OTP');
-        setTimeout(() => {
-          setOtp('');
-          setStep(1);
-        }, 500);
-      }
-    } catch (err) {
-      console.error(err);
-      if (err.response?.data?.message) {
-        toast.error(err.response.data.message);
-      } else {
-        toast.error('Verification failed');
-      }
-
-      setTimeout(() => {
-        setOtp('');
-        setStep(1);
-      }, 500);
+      console.error('Register error:', err);
+      toast.error(err.response?.data?.error || err.message || 'Registration failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,86 +51,63 @@ const RegisterPage = () => {
         <h2 className="text-2xl font-bold text-orange-600 dark:text-orange-400 text-center mb-2">Create an Account ✨</h2>
         <p className="text-gray-600 dark:text-gray-400 text-center mb-6">Register to explore Desi-Etsy</p>
 
-        {step === 1 ? (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSendOtp();
-            }}
-            className="space-y-4"
-          >
+        <form className="space-y-4" onSubmit={handleRegister}>
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={form.name}
+            onChange={e => setForm({ ...form, name: e.target.value })}
+            required
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+          />
+
+          <input
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={e => setForm({ ...form, email: e.target.value })}
+            required
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+          />
+
+          <div className="relative">
             <input
-              type="text"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={e => setForm({ ...form, name: e.target.value })}
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              value={form.password}
+              onChange={e => setForm({ ...form, password: e.target.value })}
               required
               className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
             />
-
-            <input
-              type="email"
-              placeholder="Email"
-              value={form.email}
-              onChange={e => setForm({ ...form, email: e.target.value })}
-              required
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
-            />
-
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Password"
-                value={form.password}
-                onChange={e => setForm({ ...form, password: e.target.value })}
-                required
-                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
-              />
-              <span
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 cursor-pointer text-lg"
-              >
-                {showPassword ? '👁️' : '👁️'}
-              </span>
-            </div>
-
-            {form.password && getPasswordError(form.password) && (
-              <p className="text-sm text-red-600 dark:text-red-400">{getPasswordError(form.password)}</p>
-            )}
-
-            <select
-              value={form.role}
-              onChange={e => setForm({ ...form, role: e.target.value })}
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-2.5 cursor-pointer text-lg"
             >
-              <option value="customer">Customer</option>
-              <option value="artisan">Artisan</option>
-            </select>
-
-            <button
-              type="submit"
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 rounded font-semibold transition"
-            >
-              Register
-            </button>
-          </form>
-        ) : (
-          <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="Enter OTP sent to email"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
-            />
-            <button
-              onClick={handleVerifyOtp}
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 rounded font-semibold transition"
-            >
-              Verify & Create Account
-            </button>
+              {showPassword ? '👁️' : '👁️‍🗨️'}
+            </span>
           </div>
-        )}
+
+          {form.password && getPasswordError(form.password) && (
+            <p className="text-sm text-red-600 dark:text-red-400">{getPasswordError(form.password)}</p>
+          )}
+
+          <select
+            value={form.role}
+            onChange={e => setForm({ ...form, role: e.target.value })}
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+          >
+            <option value="customer">Customer</option>
+            <option value="artisan">Artisan</option>
+          </select>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-orange-400 text-white py-2 rounded font-semibold transition"
+          >
+            {loading ? 'Registering...' : 'Register'}
+          </button>
+        </form>
 
         <p className="text-sm text-center mt-6 text-gray-600 dark:text-gray-400">
           Already have an account?{' '}
@@ -177,3 +121,4 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
+

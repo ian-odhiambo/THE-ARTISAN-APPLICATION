@@ -24,7 +24,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, {
+      const res = await axios.post('http://localhost:5000/api/v1/auth/login', {
         email,
         password,
       });
@@ -44,15 +44,12 @@ const LoginPage = () => {
         else navigate('/');
       }, 1000);
     } catch (err) {
-      toast.error('Login failed. Please check your credentials.');
+      console.error('Login error:', err);
+      toast.error(err.response?.data?.message || err.response?.data?.error || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
-
-
-
-
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -62,7 +59,6 @@ const LoginPage = () => {
 
     if (error) {
       toast.error(`Google authentication failed: ${error}`);
-      // Clear the URL parameters to prevent re-processing
       window.history.replaceState({}, document.title, window.location.pathname);
       return;
     }
@@ -77,7 +73,6 @@ const LoginPage = () => {
         if (role === 'admin') navigate('/admin/dashboard');
         else if (role === 'artisan') navigate('/artisan/dashboard');
         else navigate('/');
-        // Clear the URL parameters to prevent re-processing
         window.history.replaceState({}, document.title, window.location.pathname);
       } catch (err) {
         console.error('Error processing Google callback:', err);
@@ -142,10 +137,7 @@ const LoginPage = () => {
         </form>
 
         <div className="mt-6">
-          <GoogleRoleSelection onRoleSelect={(role) => {
-            // Role selection is handled within the component
-            console.log('Selected role:', role);
-          }} />
+          <GoogleRoleSelection />
         </div>
 
         <p className="text-sm text-center mt-6 text-gray-600 dark:text-gray-400">
@@ -162,3 +154,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+

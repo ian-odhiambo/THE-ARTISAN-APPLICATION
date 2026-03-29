@@ -9,7 +9,7 @@ dotenv.config();
 const router = express.Router();
 const otpStore = new Map(); // Temporary OTP store
 
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.MAIL_USER,
@@ -34,7 +34,7 @@ router.post('/send-email-otp', async (req, res) => {
     const mailOptions = {
       from: process.env.MAIL_USER,
       to: email,
-      subject: '🛡️ OTP Verification - Desi-Etsy',
+      subject: '🛡️ OTP Verification - Artisan-project',
       html: `
         <div style="font-family: Arial; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 500px; margin: auto;">
           <h2 style="color: #cc5200;">Desi-Etsy OTP Verification</h2>

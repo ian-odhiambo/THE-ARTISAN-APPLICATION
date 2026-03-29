@@ -146,7 +146,7 @@ const CartPage = () => {
       customerName: user.name
     };
 
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/orders`, orderData);
+`http://localhost:5000/api/v1/orders`
     const savedOrder = response.data.order; // ✅ Extract saved order
 
     toast.success(`Order placed successfully (${paymentStatus})`);
