@@ -9,7 +9,7 @@ dotenv.config();
 const router = express.Router();
 const otpStore = new Map(); // Temporary OTP store
 
-const transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransporter({
   service: 'gmail',
   auth: {
     user: process.env.MAIL_USER,
@@ -46,12 +46,19 @@ router.post('/send-email-otp', async (req, res) => {
       `,
     };
 
-    console.log(` TEST OTP for ${email}: ${otp} (use this in frontend verify!)`);
-    otpStore.set(email, otp);
-    setTimeout(() => otpStore.delete(email), 5 * 60 * 1000);
-    res.status(200).json({ message: 'OTP sent successfully' }); // Email skipped for testing
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error('❌ OTP Email Failed:', err);
+        return res.status(500).json({ error: 'Failed to send OTP. Check email settings.' });
+      } else {
+        console.log('✅ OTP Email Sent!:', info.response);
+        otpStore.set(email, otp);
+        setTimeout(() => otpStore.delete(email), 5 * 60 * 1000);
+        return res.status(200).json({ message: 'OTP sent successfully' });
+      }
+    });
   } catch (error) {
-    console.error(' Server Error!:', error);
+    console.error('❌ Server Error!:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

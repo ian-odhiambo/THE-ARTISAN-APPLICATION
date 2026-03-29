@@ -26,50 +26,57 @@ const RegisterPage = () => {
   };
 
   const handleSendOtp = async () => {
-    toast.success('Demo: Direct register (OTP skipped for testing)');
+    const passwordError = getPasswordError(form.password);
+    if (passwordError) {
+      toast.error(passwordError);
+      return;
+    }
+
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, form);
-      toast.success('Registration successful!');
-      setTimeout(() => navigate('/login'), 2000);
+      await axios.post(`${process.env.REACT_APP_API_URL}/otp/send-email-otp`, { email: form.email });
+      toast.success('OTP sent to your email');
+      setTimeout(() => setStep(2), 300);
     } catch (err) {
-      toast.error(err.response?.data?.error || err.message || 'Registration failed');
+      if (err.response?.data?.error) {
+        toast.error(err.response.data.error);
+      } else {
+        toast.error('Failed to send OTP');
+      }
     }
   };
 
   const handleVerifyOtp = async () => {
-  try {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/otp/verify-email-otp`, {
-      email: form.email,
-      otp
-    });
+    try {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/otp/verify-email-otp`, {
+        email: form.email,
+        otp
+      });
 
-    if (res.data.verified) {
-      await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, form);
-      toast.success('Registration successful!');
-      // ⏳ Delay navigation to show toast
-      setTimeout(() => navigate('/login'), 2000);
-    } else {
-      toast.error('Invalid OTP');
+      if (res.data.verified) {
+        await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, form);
+        toast.success('Registration successful!');
+        setTimeout(() => navigate('/login'), 2000);
+      } else {
+        toast.error('Invalid OTP');
+        setTimeout(() => {
+          setOtp('');
+          setStep(1);
+        }, 500);
+      }
+    } catch (err) {
+      console.error(err);
+      if (err.response?.data?.message) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error('Verification failed');
+      }
+
       setTimeout(() => {
         setOtp('');
         setStep(1);
-      }, 500); // Wait a bit to let toast show
+      }, 500);
     }
-  } catch (err) {
-    console.error(err);
-    if (err.response?.data?.message) {
-      toast.error(err.response.data.message);
-    } else {
-      toast.error('Verification failed');
-    }
-
-    // Restore input after toast
-    setTimeout(() => {
-      setOtp('');
-      setStep(1);
-    }, 500);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 to-pink-100 dark:from-gray-800 dark:to-gray-900 px-4">
@@ -120,7 +127,9 @@ const RegisterPage = () => {
               </span>
             </div>
 
-            {/* Password validation disabled for testing - any password works */}
+            {form.password && getPasswordError(form.password) && (
+              <p className="text-sm text-red-600 dark:text-red-400">{getPasswordError(form.password)}</p>
+            )}
 
             <select
               value={form.role}
