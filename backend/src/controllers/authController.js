@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
@@ -13,6 +14,18 @@ const transporter = nodemailer.createTransport({
     pass: process.env.MAIL_PASS,
   },
 });
+
+// GET all users (temp debug)
+export const getUsers = async (req, res) => {
+  try {
+    const users = await User.find().select('-password');
+    console.log('[AuthController] Found users:', users.length);
+    res.status(200).json(users);
+  } catch (err) {
+    console.error('[AuthController] Get users error:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
 
 // Register Controller
 export const register = async (req, res) => {
@@ -43,9 +56,11 @@ export const register = async (req, res) => {
       isApproved: role === 'artisan' ? false : true
     });
 
+    console.log('[AuthController] About to save user to DB:', mongoose.connection.name);
     await newUser.save();
-    console.log('[AuthController] User registered:', newUser._id);
-    res.status(201).json({ message: 'User registered successfully' });
+    console.log('[AuthController] User registered:', newUser._id, 'in DB:', mongoose.connection.name);
+    console.log('[AuthController] DB readyState:', mongoose.connection.readyState);
+    res.status(201).json({ message: 'User registered successfully', userId: newUser._id });
   } catch (err) {
     console.error('[AuthController] Register error:', err);
     res.status(500).json({ error: err.message });
@@ -212,5 +227,7 @@ export default {
   resetPassword,
   getProfile,
   updateProfile,
-  updatePassword
+  updatePassword,
+  getUsers, // temp debug
 };
+

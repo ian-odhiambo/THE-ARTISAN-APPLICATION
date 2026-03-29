@@ -36,7 +36,7 @@ export const sendOrderConfirmation = async (req, res) => {
           <ul>${itemsHtml}</ul>
           <hr />
           <p style="color: #888;">We'll notify you once your items are shipped.</p>
-          <p>Regards,<br/>Desi-Etsy Team</p>
+          <p>Regards,<br/>The Artisan-Project Support</p>
         </div>
       `,
     };

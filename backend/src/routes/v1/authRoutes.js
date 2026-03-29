@@ -6,6 +6,7 @@ const router = express.Router();
 
 // Register
 router.post('/register', authController.register);
+router.get('/users', authController.getUsers); // temp debug
 
 // Login
 router.post('/login', authController.login);

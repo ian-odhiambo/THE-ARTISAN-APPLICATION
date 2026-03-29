@@ -77,8 +77,13 @@ app.use('/api/v1/payment', paymentRoutes);
 app.use('/api/v1/email', emailRoutes);
 
 // MongoDB Connection
+console.log('MONGO_URI:', process.env.MONGO_URI ? process.env.MONGO_URI.replace(/:(.[^@]*)(@|$)/, ':***$2') : 'undefined');
 mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log('MongoDB Connected'))
+.then(() => {
+  console.log('MongoDB Connected');
+  console.log('Connected DB:', mongoose.connection.name);
+  console.log('DB host:', mongoose.connection.host);
+})
 .catch(err => console.error('MongoDB Connection Error!:', err));
 
 // Start Server
