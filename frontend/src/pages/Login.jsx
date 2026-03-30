@@ -24,9 +24,11 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
+      const trimmedEmail = email.trim();
+      const trimmedPassword = password.trim();
       const res = await axios.post('http://localhost:5000/api/v1/auth/login', {
-        email,
-        password,
+        email: trimmedEmail,
+        password: trimmedPassword,
       });
 
       localStorage.setItem('token', res.data.token);

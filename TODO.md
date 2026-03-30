@@ -1,11 +1,17 @@
-# Task: Fix Admin Dashboard - Show All Artisans & Products Too
+# Artisan Debug Progress
+✅ Login fixed (.trim())
+✅ Backend endpoints work (curl returns 3 artisans)
 
-Backend ✅ New endpoints added: /api/v1/admin/artisans, /admin/products, /admin/stats
+**Current Task:** Fix artisans not showing
 
-## Steps:
-1. [ ] Update frontend/src/pages/AdminDashboard.jsx - Add tabs for Stats, All Artisans, All Products (keep pending tabs)
-2. [ ] cd backend && npm run dev (restart server)
-3. [ ] Test: Create artisan → approve → dashboard shows all
-4. [ ] [Complete]
+**Issue:** REACT_APP_API_URL undefined (Vite issue)
+**Plan Approved:** Hardcode URLs in AdminDashboard.jsx
 
-**Current: Frontend AdminDashboard.jsx**
+**Steps:**
+- [ ] Edit AdminDashboard.jsx - replace `${process.env.REACT_APP_API_URL}` → `http://localhost:5000/api/v1`
+- [ ] Restart frontend
+- [ ] Test dashboard → 3 artisans show
+- [ ] Complete
+
+**Status:** Preparing edit...
+

@@ -29,7 +29,7 @@ const AdminDashboard = ({ darkMode }) => {
 
   const fetchAllProducts = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/admin/products`);
+`http://localhost:5000/api/v1/admin/products`
       setAllProducts(res.data);
     } catch (err) {
       toast.error('Failed to fetch all products');
@@ -83,7 +83,7 @@ const AdminDashboard = ({ darkMode }) => {
 
   const fetchUnapprovedProducts = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/products/unapproved`);
+`http://localhost:5000/api/v1/products/unapproved`
       setProducts(res.data);
     } catch (err) {
       toast.error('Failed to fetch products');
@@ -92,7 +92,7 @@ const AdminDashboard = ({ darkMode }) => {
 
   const fetchUnapprovedArtisans = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/admin/unapproved-artisans`);
+`http://localhost:5000/api/v1/admin/unapproved-artisans`
       setUnapprovedArtisans(res.data);
     } catch (err) {
       toast.error('Failed to fetch artisans');
