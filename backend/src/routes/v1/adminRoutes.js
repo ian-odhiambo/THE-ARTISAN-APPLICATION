@@ -1,40 +1,16 @@
 import express from 'express';
-import User from '../../models/User.js';
+import * as adminController from '../../controllers/adminController.js';
 
 const router = express.Router();
 
-// Get all unapproved artisans
-router.get('/unapproved-artisans', async (req, res) => {
-  try {
-    const artisans = await User.find({ role: 'artisan', isApproved: false });
-    res.status(200).json(artisans);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+router.get('/unapproved-artisans', adminController.getUnapprovedArtisans);
 
-// Approve artisan
-router.patch('/approve-artisan/:id', async (req, res) => {
-  try {
-    const updated = await User.findByIdAndUpdate(
-      req.params.id,
-      { isApproved: true },
-      { new: true }
-    );
-    res.status(200).json(updated);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+router.patch('/approve-artisan/:id', adminController.approveArtisan);
 
-// Reject artisan (optional delete)
-router.delete('/reject-artisan/:id', async (req, res) => {
-  try {
-    await User.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: 'Artisan rejected and removed' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+router.delete('/reject-artisan/:id', adminController.rejectArtisan);
+
+router.get('/artisans', adminController.getAllArtisans);
+router.get('/products', adminController.getAllProducts);
+router.get('/stats', adminController.getAdminStats);
 
 export default router;

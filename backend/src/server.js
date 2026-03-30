@@ -9,7 +9,7 @@ import User from './models/User.js';
 
 // Import route files 
 import authRoutes from './routes/v1/authRoutes.js';
-import productRoutes from './routes/v1/ProductsRoutes.js';
+import productRoutes from './routes/v1/productsRoutes.js';
 import adminRoutes from './routes/v1/adminRoutes.js';
 import emailOtpRoutes from './routes/v1/emailOtpRoutes.js';
 import orderRoutes from './routes/v1/orderRoutes.js';

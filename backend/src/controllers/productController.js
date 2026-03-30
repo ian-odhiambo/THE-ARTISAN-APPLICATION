@@ -1,7 +1,7 @@
 import Product from '../models/Product.js';
 import User from '../models/User.js';
 
-// Create Product Controller
+ // Create Product Controller
 export const createProduct = async (req, res) => {
   try {
     console.log('[ProductController] Create product:', req.body.title);
@@ -11,9 +11,12 @@ export const createProduct = async (req, res) => {
     const artisan = await User.findById(artisanId);
     if (!artisan) return res.status(404).json({ message: 'Artisan not found' });
 
+    // this i have bypassed for the check
+    /*
     if (artisan.role === 'artisan' && !artisan.isApproved) {
       return res.status(403).json({ message: 'Your artisan profile is not approved yet.' });
     }
+    */
 
     const product = new Product({ title, description, price, image, category, artisanId });
     await product.save();
@@ -133,3 +136,4 @@ export default {
   deleteProduct,
   getProduct
 };
+

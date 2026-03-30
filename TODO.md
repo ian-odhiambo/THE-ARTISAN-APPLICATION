@@ -1,25 +1,11 @@
-# Admin Dashboard Access Enabled
+# Task: Fix Admin Dashboard - Show All Artisans & Products Too
 
-Admin user created successfully!
+Backend ✅ New endpoints added: /api/v1/admin/artisans, /admin/products, /admin/stats
 
-**Credentials:**
-- Email: `admin@theartisanproject.com`
-- Password: `Admin@123!`
+## Steps:
+1. [ ] Update frontend/src/pages/AdminDashboard.jsx - Add tabs for Stats, All Artisans, All Products (keep pending tabs)
+2. [ ] cd backend && npm run dev (restart server)
+3. [ ] Test: Create artisan → approve → dashboard shows all
+4. [ ] [Complete]
 
-## Steps Completed
-- [x] 1. Created TODO.md
-- [x] 2. Created backend/src/scripts/createAdmin.js
-- [x] 3. Executed script to insert admin into DB (hashed password)
-
-## To Test:
-1. `cd backend && npm run dev` (start server)
-2. `cd frontend && npm run dev` (start frontend)
-3. Go to http://localhost:3000/login
-4. Login with admin credentials → redirects to Admin Dashboard
-
-## Production Notes:
-- Change password after first login (/update-password)
-- Admin cannot register via UI (blocked for security)
-- Delete `backend/src/scripts/createAdmin.js` before committing or add to .gitignore
-
-**Task Complete!** 🎉
+**Current: Frontend AdminDashboard.jsx**
