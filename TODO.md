@@ -1,41 +1,25 @@
-# Fix Data Not Saving to MongoDB
+# Admin Dashboard Access Enabled
+
+Admin user created successfully!
+
+**Credentials:**
+- Email: `admin@theartisanproject.com`
+- Password: `Admin@123!`
 
 ## Steps Completed
-- [x] Analyzed backend controllers/routes/models - save logic correct
-- [x] Started backend dev server
-- [x] Created frontend/.env with REACT_APP_API_URL
-- [x] Frontend now sends requests (OTP error confirms connectivity)
+- [x] 1. Created TODO.md
+- [x] 2. Created backend/src/scripts/createAdmin.js
+- [x] 3. Executed script to insert admin into DB (hashed password)
 
-## Current Issue: Failed to send OTP
-Backend /otp/send-email-otp reached but nodemailer fails (likely Gmail auth)
+## To Test:
+1. `cd backend && npm run dev` (start server)
+2. `cd frontend && npm run dev` (start frontend)
+3. Go to http://localhost:3000/login
+4. Login with admin credentials → redirects to Admin Dashboard
 
-## Next Steps
-1. Restart frontend dev server (`cd frontend && npm run dev`)
-2. **Fix backend/.env email config:**
-   ```
-   MAIL_USER=yourgmail@gmail.com
-   MAIL_PASS=your 16-char app password (not account password)
-   ```
-   - Enable 2FA on Gmail
-   - Generate App Password: Google Account > Security > App passwords > Mail > Generate
-3. Restart backend dev
-4. Test register:
-   - Strong password (Test123!)
-   - Click Register → check backend log for OTP send success
-   - Enter OTP from *email* → Verify → register success
-5. Check Atlas Users collection
-6. Test Cart → Order POST
+## Production Notes:
+- Change password after first login (/update-password)
+- Admin cannot register via UI (blocked for security)
+- Delete `backend/src/scripts/createAdmin.js` before committing or add to .gitignore
 
-## Next Steps
-
-1. Restart frontend dev server (`cd frontend && npm run dev`)
-2. Test register form:
-   - Fill name, email, strong password (e.g. Passw0rd!)
-   - Click Register → OTP sent toast → step 2
-   - Enter OTP from email → Verify → success + login redirect
-3. Check backend console for:
-   - MongoDB Connected
-   - [AuthController] Register attempt
-   - User registered
-4. Check MongoDB Atlas Users collection
-5. Test order place from CartPage
+**Task Complete!** 🎉
