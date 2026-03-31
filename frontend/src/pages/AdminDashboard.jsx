@@ -20,27 +20,34 @@ const AdminDashboard = ({ darkMode }) => {
 
   const fetchAllArtisans = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/admin/artisans`);
+      console.log('Fetching all artisans from: http://localhost:5000/api/v1/admin/artisans');
+      const res = await axios.get('http://localhost:5000/api/v1/admin/artisans');
+      console.log('Artisans loaded:', res.data.length);
       setAllArtisans(res.data);
     } catch (err) {
+      console.error('All artisans fetch failed:', err.response?.status, err.message);
       toast.error('Failed to fetch all artisans');
     }
   };
 
   const fetchAllProducts = async () => {
     try {
-`http://localhost:5000/api/v1/admin/products`
+      console.log('Fetching all products...');
+      const res = await axios.get(`http://localhost:5000/api/v1/admin/products`);
       setAllProducts(res.data);
     } catch (err) {
+      console.error('Fetch products error:', err);
       toast.error('Failed to fetch all products');
     }
   };
 
   const fetchStats = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/admin/stats`);
+      console.log('Fetching admin stats...');
+      const res = await axios.get('http://localhost:5000/api/v1/admin/stats');
       setStats(res.data);
     } catch (err) {
+      console.error('Stats fetch failed:', err.response?.status, err.message);
       toast.error('Failed to fetch stats');
     }
   };
@@ -83,7 +90,8 @@ const AdminDashboard = ({ darkMode }) => {
 
   const fetchUnapprovedProducts = async () => {
     try {
-`http://localhost:5000/api/v1/products/unapproved`
+      const res = await axios.get('http://localhost:5000/api/v1/products/unapproved');
+      console.log('Unapproved products:', res.data.length);
       setProducts(res.data);
     } catch (err) {
       toast.error('Failed to fetch products');
@@ -92,20 +100,29 @@ const AdminDashboard = ({ darkMode }) => {
 
   const fetchUnapprovedArtisans = async () => {
     try {
-`http://localhost:5000/api/v1/admin/unapproved-artisans`
+      console.log('Fetching unapproved artisans...');
+      const res = await axios.get(`http://localhost:5000/api/v1/admin/unapproved-artisans`);
       setUnapprovedArtisans(res.data);
     } catch (err) {
+      console.error('Fetch unapproved artisans error:', err);
       toast.error('Failed to fetch artisans');
     }
   };
 
   const handleApproveProduct = async (id) => {
     try {
-      await axios.patch(`${process.env.REACT_APP_API_URL}/products/approve/${id}`, { isApproved: true });
-      toast.success('Product approved ');
+      console.log('=== APPROVING PRODUCT === ID:', id);
+      const response = await axios.patch(`http://localhost:5000/api/v1/products/approve/${id}`, { isApproved: true });
+      console.log('Approve response:', response.status, response.data);
+      toast.success('Product approved ✅');
       fetchUnapprovedProducts();
+      fetchAllProducts();
     } catch (err) {
-      toast.error('Error approving product');
+      console.error('=== APPROVE ERROR ===');
+      console.error('Status:', err.response?.status);
+      console.error('Data:', err.response?.data);
+      console.error('Message:', err.message);
+      toast.error(`Error approving product (${err.response?.status || 'Unknown'})`);
     }
   };
 
@@ -123,10 +140,13 @@ const AdminDashboard = ({ darkMode }) => {
 
   const handleApproveArtisan = async (id) => {
     try {
-      await axios.patch(`${process.env.REACT_APP_API_URL}/admin/approve-artisan/${id}`);
+      console.log('Approving artisan ID:', id);
+      await axios.patch(`http://localhost:5000/api/v1/admin/approve-artisan/${id}`);
       toast.success('Artisan approved ✅');
+      fetchAllArtisans();
       fetchUnapprovedArtisans();
     } catch (err) {
+      console.error('Approve failed:', err.response?.status, err.response?.data || err.message);
       toast.error('Error approving artisan');
     }
   };
@@ -134,10 +154,13 @@ const AdminDashboard = ({ darkMode }) => {
   const handleRejectArtisan = async (id) => {
     if (window.confirm('Are you sure you want to reject this artisan?')) {
       try {
-        await axios.delete(`${process.env.REACT_APP_API_URL}/admin/reject-artisan/${id}`);
+        console.log('Rejecting artisan:', id);
+        await axios.delete(`http://localhost:5000/api/v1/admin/reject-artisan/${id}`);
         toast.error('Artisan rejected ❌');
+        fetchAllArtisans();
         fetchUnapprovedArtisans();
       } catch (err) {
+        console.error('Reject artisan failed:', err.response?.status, err.response?.data);
         toast.error('Error rejecting artisan');
       }
     }

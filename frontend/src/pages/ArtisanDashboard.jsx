@@ -95,7 +95,9 @@ const ArtisanDashboard = ({ darkMode }) => {
   useEffect(() => {
     if (user?.role === 'artisan') {
       const fetchProducts = async () => {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/products/artisan/${artisanId}`);
+        console.log('Fetching artisan products for:', artisanId);
+        const res = await axios.get(`http://localhost:5000/api/v1/products/artisan/${artisanId}`);
+        console.log('Artisan products:', res.data);
         setProducts(res.data);
       };
 
@@ -129,7 +131,9 @@ const ArtisanDashboard = ({ darkMode }) => {
         await axios.put(`${process.env.REACT_APP_API_URL}/products/${form._id}`, productData);
         toast.success('Product updated successfully ✅');
       } else {
-        await axios.post(`${process.env.REACT_APP_API_URL}/products`, productData);
+        console.log('Creating product with data:', productData);
+        const createRes = await axios.post('http://localhost:5000/api/v1/products', productData);
+        console.log('Product created:', createRes.data);
         toast.success('Product added successfully ✅');
       }
       setForm({ title: '', description: '', price: '', image: '', category: '', _id: '' });
