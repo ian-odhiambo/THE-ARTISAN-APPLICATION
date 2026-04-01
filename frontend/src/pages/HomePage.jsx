@@ -128,6 +128,7 @@ const ProductCard = React.memo(({ product, isInWishlist, onWishlistToggle, onCat
 
 const HomePage = ({ darkMode, toggleDarkMode }) => {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -142,18 +143,30 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/products`);
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/v1';
+        const res = await axios.get(`${apiUrl}/products`);
         const productsWithAttributes = res.data.map(product => ({
           ...product,
           rating: product.rating || Math.floor(Math.random() * 2) + 4,
           reviews: product.reviews || Math.floor(Math.random() * 50) + 10,
-          isTopSeller: Math.random() > 0.7, // 30% chance
-          discountPercentage: Math.random() > 0.6 ? Math.floor(Math.random() * 30) + 10 : 0, // 40% chance of discount
-          isNewArrival: Math.random() > 0.8 // 20% chance
+          isTopSeller: product.isTopSeller !== undefined ? product.isTopSeller : Math.random() > 0.7,
+          discountPercentage: product.discountPercentage || (Math.random() > 0.6 ? Math.floor(Math.random() * 30) + 10 : 0),
+          isNewArrival: product.isNewArrival !== undefined ? product.isNewArrival : Math.random() > 0.8
         }));
         setProducts(productsWithAttributes);
       } catch (err) {
-        toast.error('Failed to load products');
+        console.error('API Error:', err);
+        toast.error('Failed to load products - using demo data');
+        // Fallback demo data
+        setProducts([
+          { _id: 'demo1', title: 'Handmade Silk Saree', category: 'Clothing', price: 2500, image: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=300', rating: 4.8 },
+          { _id: 'demo2', title: 'Clay Diwali Lamp', category: 'Home Decor', price: 450, image: 'https://images.unsplash.com/photo-1578864127336-17d539d9d863?w=300', rating: 4.9 },
+          { _id: 'demo3', title: 'Wooden Jewelry Box', category: 'Accessories', price: 1200, image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300', rating: 4.7 },
+          { _id: 'demo4', title: 'Brass Incense Holder', category: 'Puja Items', price: 800, image: 'https://images.unsplash.com/photo-1628259333391-1a4586576642?w=300', rating: 4.6 },
+          { _id: 'demo5', title: 'Block Print Cushion', category: 'Home Decor', price: 650, image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300', rating: 4.8 },
+        ].map(p => ({ ...p, isTopSeller: true, discountPercentage: 15, isNewArrival: true, reviews: 25 })));
+      } finally {
+        setLoading(false);
       }
     };
     fetchFeatured();
@@ -521,8 +534,8 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
         <div className="max-w-7xl mx-auto space-y-12">
 
           {/* Top Sellers */}
-          {products.filter(p => p.isTopSeller).length > 0 && (
-            <div>
+{products.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4">
               <h3 className="text-2xl font-bold mb-6 text-center flex items-center justify-center gap-2">
                 <span className="text-orange-600">🏆</span> Top Sellers
               </h3>
@@ -587,8 +600,8 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
           )}
 
           {/* New Arrivals */}
-          {products.filter(p => p.isNewArrival).length > 0 && (
-            <div>
+{products.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4">
               <h3 className="text-2xl font-bold mb-6 text-center flex items-center justify-center gap-2">
                 <span className="text-green-600">✨</span> New Arrivals
               </h3>
@@ -672,13 +685,13 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
       {/* Features Section */}
       <div className="bg-orange-50 dark:bg-gray-900 py-16 px-4">
         <div className="max-w-6xl mx-auto">
-          <h3 className="text-2xl font-bold mb-12 text-center">Why Choose Desi-Etsy?</h3>
+          <h3 className="text-2xl font-bold mb-12 text-center">Why Choose The Artsian app?</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
                 icon: '🖌️',
                 title: 'Authentic Handmade',
-                description: 'Every product is crafted with love by skilled Indian artisans'
+                description: 'Every product is crafted with love by skilled Kenyan artisans'
               },
               {
                 icon: '🚚',
