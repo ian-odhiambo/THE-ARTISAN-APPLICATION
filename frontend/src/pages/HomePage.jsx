@@ -139,32 +139,30 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user')) || null;
 
-  //  Products fetch
+// Products fetch - FIXED to always work
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/v1';
+        const apiUrl = 'http://localhost:5000/api/v1';
+        console.log('Fetching products from:', `${apiUrl}/products`);
         const res = await axios.get(`${apiUrl}/products`);
-        const productsWithAttributes = res.data.map(product => ({
+        console.log('API Response:', res.data.length, 'products');
+        
+        // Assign flags deterministically for 2 products
+        const productsWithAttributes = res.data.map((product, index) => ({
           ...product,
-          rating: product.rating || Math.floor(Math.random() * 2) + 4,
-          reviews: product.reviews || Math.floor(Math.random() * 50) + 10,
-          isTopSeller: product.isTopSeller !== undefined ? product.isTopSeller : Math.random() > 0.7,
-          discountPercentage: product.discountPercentage || (Math.random() > 0.6 ? Math.floor(Math.random() * 30) + 10 : 0),
-          isNewArrival: product.isNewArrival !== undefined ? product.isNewArrival : Math.random() > 0.8
+          rating: 4.5,
+          reviews: 24,
+          isTopSeller: index === 0,
+          discountPercentage: index === 1 ? 15 : 0,
+          isNewArrival: index === 1
         }));
+        console.log('Processed products:', productsWithAttributes);
         setProducts(productsWithAttributes);
       } catch (err) {
         console.error('API Error:', err);
-        toast.error('Failed to load products - using demo data');
-        // Fallback demo data
-        setProducts([
-          { _id: 'demo1', title: 'Handmade Silk Saree', category: 'Clothing', price: 2500, image: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=300', rating: 4.8 },
-          { _id: 'demo2', title: 'Clay Diwali Lamp', category: 'Home Decor', price: 450, image: 'https://images.unsplash.com/photo-1578864127336-17d539d9d863?w=300', rating: 4.9 },
-          { _id: 'demo3', title: 'Wooden Jewelry Box', category: 'Accessories', price: 1200, image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=300', rating: 4.7 },
-          { _id: 'demo4', title: 'Brass Incense Holder', category: 'Puja Items', price: 800, image: 'https://images.unsplash.com/photo-1628259333391-1a4586576642?w=300', rating: 4.6 },
-          { _id: 'demo5', title: 'Block Print Cushion', category: 'Home Decor', price: 650, image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300', rating: 4.8 },
-        ].map(p => ({ ...p, isTopSeller: true, discountPercentage: 15, isNewArrival: true, reviews: 25 })));
+        toast.error('API failed - check backend');
+        setProducts([]); 
       } finally {
         setLoading(false);
       }
@@ -510,7 +508,7 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
 
       {/* Categories */}
       <div className="px-4 py-12 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-900">
-        <h3 className="text-2xl font-bold mb-8 text-center">🧵 Discover Categories</h3>
+        <h3 className="text-2xl font-bold mb-8 text-center">Discover Categories</h3>
         <div className="flex flex-wrap gap-4 justify-center max-w-4xl mx-auto">
           {categories.map((cat, index) => (
             <motion.div
@@ -534,7 +532,7 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
         <div className="max-w-7xl mx-auto space-y-12">
 
           {/* Top Sellers */}
-{products.length > 0 && (
+          {products.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4">
               <h3 className="text-2xl font-bold mb-6 text-center flex items-center justify-center gap-2">
                 <span className="text-orange-600">🏆</span> Top Sellers
@@ -637,47 +635,40 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
       {/* Product Grid */}
       <div id="product-grid" className="px-4 py-12 max-w-7xl mx-auto">
         <h3 className="text-2xl font-bold mb-8 text-center">✨ Handpicked For You</h3>
-        <div className="flex space-x-6 overflow-x-auto scrollbar-hide py-2">
-          {filteredProducts.map((p, index) => (
-            <motion.div
-              key={p._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-            >
-              <div className="relative">
-                {/* Product Badges */}
-                {p.rating >= 4.5 && (
-                  <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
-                    🌟 Best Seller
-                  </span>
-                )}
-                {p.discountPercentage > 0 && (
-                  <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
-                    {p.discountPercentage}% OFF
-                  </span>
-                )}
-                {p.isTopSeller && !p.discountPercentage && p.rating < 4.5 && (
-                  <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
-                    🏆 Top Seller
-                  </span>
-                )}
-                {p.isNewArrival && !p.discountPercentage && !p.isTopSeller && (
-                  <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
-                    ✨ New
-                  </span>
-                )}
-
-                <ProductCard
-                  product={p}
-                  isInWishlist={isInWishlist(p._id)}
-                  onWishlistToggle={handleWishlistToggle}
-                  onCategoryClick={handleCategoryClick}
-                />
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No products match your search. Create some in AdminDashboard!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredProducts.map((p, index) => (
+              <motion.div
+                key={p._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+              >
+                <div className="relative">
+                  {p.discountPercentage > 0 && (
+                    <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
+                      {p.discountPercentage}% OFF
+                    </span>
+                  )}
+                  <ProductCard
+                    product={p}
+                    isInWishlist={isInWishlist(p._id)}
+                    onWishlistToggle={handleWishlistToggle}
+                    onCategoryClick={handleCategoryClick}
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
 
       </div>
