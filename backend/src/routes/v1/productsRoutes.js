@@ -9,14 +9,9 @@ import { createProduct } from '../../controllers/productController.js';
 
 router.post('/', createProduct);
 
-router.get('/', async (req, res) => {
-  try {
-    const products = await Product.find({ isApproved: true });
-    res.status(200).json(products);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+import { getAllProducts } from '../../controllers/productController.js';
+
+router.get('/', getAllProducts);
 
 // Get products by artisan ID
 router.get('/artisan/:artisanId', async (req, res) => {

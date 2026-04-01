@@ -34,7 +34,7 @@ export const getAllProducts = async (req, res) => {
   try {
     console.log('[ProductController] Get all approved products');
     
-    const products = await Product.find({ isApproved: true });
+const products = await Product.find({ isApproved: true }).sort({createdAt: -1}).populate('artisanId', 'name');
     res.status(200).json(products);
   } catch (err) {
     console.error('[ProductController] Get all error:', err);
