@@ -232,7 +232,7 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
           className="text-xl md:text-2xl font-bold text-orange-600 hover:underline"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} // Scroll to top on click
         >
-          Desi-Etsy 🧵
+         The Artisan
         </Link>
 
 
@@ -548,7 +548,7 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
                     <div className="relative">
                       {/* Top Seller Badge */}
                       <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
-                        🏆 Top Seller
+                        🏆 Featured artisanry
                       </span>
 
                       <ProductCard
