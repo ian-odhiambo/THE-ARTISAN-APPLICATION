@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import bannerImg from '../../assets/hero.png';
-import videoSrc from '../../assets/hero.png';
+import videoSrc from '../../assets/video.mp4';
 
 const WhoWeAre = () => {
   const navigate = useNavigate();
