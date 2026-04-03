@@ -14,7 +14,7 @@ const RecommendedProducts = ({ category, currentProductId }) => {
   React.useEffect(() => {
     const fetchRecommended = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/products?category=${encodeURIComponent(category)}`);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/products?category=${encodeURIComponent(category)}`);
         // Filter out current product
         const filtered = res.data.filter(p => p._id !== currentProductId);
         setRecommended(filtered); // Show all recommended products
@@ -85,10 +85,11 @@ const ProductDetailsPage = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/products/${id}`);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/products/${id}`);
         setProduct(res.data);
       } catch (err) {
-        toast.error('Failed to load product');
+        console.error('ProductDetails fetch error:', err.response?.data || err.message || err);
+        toast.error(`Failed to load product: ${err.response?.status || 'Network Error'}`);
         navigate('/');
       } finally {
         setLoading(false);
@@ -135,11 +136,29 @@ const ProductDetailsPage = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 px-4 py-10">
       <div className="w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg shadow-lg p-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        <img
-          src={product.image || 'https://via.placeholder.com/300'}
-          alt={product.title}
-          className="w-full h-[400px] object-contain rounded-lg border"
-        />
+        <div className="w-full h-[400px] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center">
+          {product.image ? (
+            <img
+              src={product.image}
+              alt={product.title}
+              className="w-full h-full object-contain rounded-lg"
+              crossOrigin="anonymous"
+              referrerPolicy="no-referrer"
+              decoding="async"
+              loading="lazy"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          ) : (
+            <div className="text-center text-gray-500 dark:text-gray-400">
+              <svg className="w-16 h-16 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <p className="text-sm font-medium">Product Image</p>
+            </div>
+          )}
+        </div>
 
         <div className="space-y-4">
           <h2 className="text-3xl font-bold">{product.title}</h2>

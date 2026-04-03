@@ -9,7 +9,7 @@ const WhoWeAre = () => {
 
   return (
     <div className="relative w-screen min-h-[400px] md:h-[450px] flex flex-col md:flex-row" style={{ backgroundImage: `url(${bannerImg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-      {/* Left Half - Video */}
+      {/* Left Half o my hero section - Video */}
       <div className="w-full md:w-1/2 relative h-64 md:h-auto">
         <video
           src={videoSrc}
@@ -19,7 +19,7 @@ const WhoWeAre = () => {
           className="w-full h-full object-cover"
         />
       </div>
-      {/* Right Half - Who We Are */}
+      {/* Right Half will be informative- Who We Are */}
       <div className="w-full md:w-1/2 relative flex flex-col justify-center items-center text-center px-2 md:px-4 py-4 md:py-0 overflow-visible" style={{ backgroundImage: `url(${bannerImg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
