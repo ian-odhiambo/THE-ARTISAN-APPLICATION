@@ -20,7 +20,7 @@ const Navigation = ({ darkMode, toggleDarkMode, searchTerm, setSearchTerm, selec
         className="text-xl md:text-2xl font-bold text-orange-600 hover:underline"
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       >
-        Desi-Etsy 🧵
+        My Fundi
       </Link>
 
       {/* Search and Category in Header */}

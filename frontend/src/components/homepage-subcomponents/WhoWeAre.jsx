@@ -29,7 +29,7 @@ const WhoWeAre = () => {
         >
           <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-orange-600 dark:text-orange-400">Who We Are</h2>
           <p className="mb-3 md:mb-4 text-sm md:text-base text-gray-100 max-w-sm mx-auto">
-            Celebrating India's rich heritage of craftsmanship by connecting talented artisans with customers nationwide. Every product is crafted with love by skilled Indian creators. Celebrate handmade and heartmade products.
+            To empower Kenya's artisans by connecting them directly with clients for custom work, while simultaneously offering a curated marketplace where finished handcrafted products can be discovered and purchased.
           </p>
           <motion.button
             whileHover={{ scale: 1.05 }}

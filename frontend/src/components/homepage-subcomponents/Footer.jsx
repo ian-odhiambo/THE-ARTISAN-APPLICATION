@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { FiHome, FiShoppingCart, FiHeart, FiPackage, FiStar } from 'react-icons/fi';
 
@@ -9,7 +8,7 @@ const Footer = ({ user }) => {
         <div id="about-us">
           <h4 className="text-lg font-semibold mb-4">About Desi-Etsy</h4>
           <p className="text-sm text-gray-400 mb-4">
-            Celebrating India's rich heritage of craftsmanship by connecting talented artisans with customers nationwide.
+            To empower Kenya's artisans by connecting them directly with clients for custom work, while simultaneously offering a curated marketplace where finished handcrafted products can be discovered and purchased.
           </p>
           <p className="italic text-orange-300">Handmade. Heartmade. Just for you.</p>
         </div>
@@ -61,12 +60,12 @@ const Footer = ({ user }) => {
             </li>
             <li>
               <a 
-                href="https://github.com/Rohitsharma97714/Niche-E-commerce-Platform-for-Handmade-Products" 
+                href="" 
                 target="_blank" 
                 rel="noreferrer" 
                 className="hover:text-orange-400 transition-colors flex items-center gap-2"
               >
-                <FiStar size={14} /> GitHub Repo
+                <FiStar size={14} /> Our Oficial webpage 
               </a>
             </li>
           </ul>
@@ -75,8 +74,8 @@ const Footer = ({ user }) => {
         <div>
           <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
           <div className="text-sm text-gray-300 space-y-2">
-            <p> support@team.com</p>
-            <p> +2549771408819</p>
+            <p> odhiamboian096@gmail.com</p>
+            <p> +254704706076</p>
             <p> Nairobi, Kenya</p>
           </div>
           <div className="flex gap-4 mt-4">
