@@ -4,7 +4,6 @@ import { useCart } from '../context/CartContext';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
 // Optimized Cart Item Component with lazy loading
 const CartItem = React.memo(({ item, onIncrease, onDecrease, onRemove, priority = false }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -61,12 +60,12 @@ const CartItem = React.memo(({ item, onIncrease, onDecrease, onRemove, priority 
         <h4 className="text-lg font-semibold">{item.title}</h4>
         {item.discountPercentage && item.discountPercentage > 0 ? (
           <p className="text-sm text-gray-600 dark:text-gray-400 text-right">
-            Price: <span className="line-through">₹{item.originalPrice}</span>{' '}
-            <span className="text-red-600 font-semibold">₹{item.price}</span>{' '}
+            Price: <span className="line-through">KSH{item.originalPrice}</span>{' '}
+            <span className="text-red-600 font-semibold">KSH{item.price}</span>{' '}
             <span className="text-green-600 font-medium">({item.discountPercentage}% OFF)</span>
           </p>
         ) : (
-          <p className="text-sm text-gray-600 dark:text-gray-400 text-right">Price: ₹{item.price}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 text-right">Price: KSH{item.price}</p>
         )}
         <div className="flex items-center gap-2 mt-2">
           <button
@@ -98,10 +97,7 @@ const CartPage = () => {
   const [showDeliveryForm, setShowDeliveryForm] = useState(false);
   const [deliveryDetails, setDeliveryDetails] = useState({
     name: '',
-    mobile: '',
-    pincode: '',
-    state: '',
-    city: '',
+    phoneNumber: '',
     address: '',
     paymentMode: '',
   });
@@ -131,36 +127,39 @@ const CartPage = () => {
   }, [cartItems, setCartItems]);
 
   const saveOrder = async (paymentStatus) => {
-  try {
-    const orderData = {
-      userId: user._id,
-      items: cartItems.map(item => ({
-        productId: item._id,
-        quantity: item.quantity,
-        artisan: item.artisan,
-      })),
-      total: totalPrice,
-      address: deliveryDetails.address,
-      paymentStatus,
-      customerEmail: user.email,
-      customerName: user.name
-    };
+    try {
+      const orderData = {
+        userId: user._id,
+        items: cartItems.map(item => ({
+          productId: item._id,
+          quantity: item.quantity,
+          artisan: item.artisanId || item.artisan,
+        })),
+        total: totalPrice,
+        address: deliveryDetails.address,
+        paymentStatus
+      };
 
-`http://localhost:5000/api/v1/orders`
-    const savedOrder = response.data.order; // ✅ Extract saved order
+      const response = await axios.post('http://localhost:5000/api/v1/orders', orderData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
 
-    toast.success(`Order placed successfully (${paymentStatus})`);
-    setCartItems([]);
-    localStorage.removeItem('cart');
-    setShowDeliveryForm(false);
+      const savedOrder = response.data.order;
 
-    return savedOrder; // ✅ Return saved order
-  } catch (err) {
-    toast.error('Failed to save order');
-    console.error(err);
-    throw err;
-  }
-};
+      toast.success(`Order placed successfully (${paymentStatus})`);
+      setCartItems([]);
+      localStorage.removeItem('cart');
+      setShowDeliveryForm(false);
+
+      return savedOrder;
+    } catch (err) {
+      toast.error('Failed to save order: ' + (err.response?.data?.error || err.message));
+      console.error(err);
+      throw err;
+    }
+  };
 
   const handleRemove = useCallback((id) => {
     removeFromCart(id);
@@ -172,202 +171,183 @@ const CartPage = () => {
     toast.info('Enter your delivery details');
   }, []);
 
-  const handlePayment = async () => {
-  try {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/payment/order`, { 
-      amount: totalPrice,
-    });
+  const handleMpesaPayment = async () => {
+    try {
+      if (!deliveryDetails.phoneNumber || !deliveryDetails.phoneNumber.startsWith('254')) {
+        toast.error('Please enter valid Kenyan phone number (2547xxxxxxxx)');
+        return;
+      }
 
-    const order = res.data;
+      const response = await axios.post('http://localhost:5000/api/v1/payment/order', {
+        amount: totalPrice,
+        phoneNumber: deliveryDetails.phoneNumber,
+        orderItems: cartItems.map(item => ({
+          productId: item._id,
+          quantity: item.quantity,
+          artisan: item.artisanId || item.artisan
+        })),
+        address: deliveryDetails.address
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
 
-    const options = {
-      key: 'rzp_test_p5bmclWL1NpERt',
-      amount: order.amount,
-      currency: 'INR',
-      name: 'Desi-Etsy',
-      description: 'Order Payment',
-      order_id: order.id,
-      handler: async function (response) {
-  try {
-    const savedOrder = await saveOrder('Paid');
+      toast.success('M-Pesa PIN prompt sent to your phone! Complete payment there.');
+      console.log('M-Pesa response:', response.data);
 
-      await axios.post(`${process.env.REACT_APP_API_URL}/email/order-confirmation`, {
-      orderId: savedOrder._id, // ✅ Correct ID
-      customerEmail: user.email,
-      customerName: user.name,
-      items: cartItems,
-      totalAmount: totalPrice,
-      paymentMethod: 'Razorpay'
-    });
-  } catch (error) {
-    console.error('Email sending failed:', error);
-  }
-},
-      prefill: {  
-        name: deliveryDetails.name,
-        email: user.email,
-        contact: deliveryDetails.mobile,
-      },
-      notes: {
-        address: deliveryDetails.address,
-      },
-      theme: {
-        color: '#cc5200',
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-  } catch (error) {
-    toast.error('Payment initiation failed');
-    console.error('Payment Error:', error);
-  }
-};
-
+      // Clear cart after successful initiation
+      setCartItems([]);
+      localStorage.removeItem('cart');
+      setShowDeliveryForm(false);
+    } catch (error) {
+      toast.error('M-Pesa payment initiation failed: ' + (error.response?.data?.details || error.message));
+      console.error('M-Pesa Error:', error.response?.data || error);
+    }
+  };
 
   const handleFinalSubmit = async () => {
-  const { name, mobile, address, paymentMode, pincode, state, city } = deliveryDetails;
+    const { name, phoneNumber, address, paymentMode } = deliveryDetails;
 
-  if (!name || !mobile || !address || !pincode || !state || !city) {
-    toast.error('Please fill in all delivery details');
-    return;
-  }
+    if (!name || !phoneNumber || !address) {
+      toast.error('Please fill in all delivery details');
+      return;
+    }
 
-  if (!user || !user._id) {
-    toast.error('You must be logged in to place an order');
-    return;
-  }
-      if (!paymentMode) {
+    if (!user || !user._id) {
+      toast.error('You must be logged in to place an order');
+      return;
+    }
+
+    if (!paymentMode) {
       toast.error('Please select a payment mode');
       return;
     }
 
-
-  if (paymentMode === 'cod') {
-    try {
-      const savedOrder = await saveOrder('Pending');
-      // Send COD confirmation email
-      await axios.post(`${process.env.REACT_APP_API_URL}/email/order-confirmation`, {
-        orderId: savedOrder._id,
-        customerEmail: user.email,
-        customerName: user.name,
-        items: cartItems.map(item => ({
-          title: item.title,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-        totalAmount: totalPrice,
-        paymentMethod: 'Cash on Delivery'
-      });
-    } catch (error) {
-      console.error('Email sending failed:', error);
-      toast.error('Order saved but email failed');
+    if (paymentMode === 'mpesa' && (!phoneNumber || !phoneNumber.startsWith('254'))) {
+      toast.error('Please enter valid M-Pesa phone number (2547xxxxxxxx)');
+      return;
     }
-  } else {
-    handlePayment();
-  }
-};
+
+    if (paymentMode === 'cod') {
+      try {
+        const savedOrder = await saveOrder('Pending');
+        await axios.post('http://localhost:5000/api/v1/email/order-confirmation', {
+          orderId: savedOrder._id,
+          customerEmail: user.email,
+          customerName: user.name,
+          items: cartItems.map(item => ({
+            title: item.title,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+          totalAmount: totalPrice,
+          paymentMethod: 'Cash on Delivery'
+        }, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        toast.success('Order placed with COD! Check email.');
+      } catch (error) {
+        if (error.response?.status !== 500) throw error;
+        console.error('Email failed:', error);
+        toast.warning('Order saved but email failed');
+      }
+    } else if (paymentMode === 'mpesa') {
+      handleMpesaPayment();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-6xl mx-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg shadow-lg p-6">
-      <h2 className="text-2xl font-bold mb-4">🛒 Your Cart</h2>
+        <h2 className="text-2xl font-bold mb-4">🛒 Your Cart</h2>
 
-      {cartItems.length === 0 ? (
-        <p className="text-gray-600 dark:text-gray-400">Your cart is empty.</p>
-      ) : (
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left - Cart Items */}
-          <div className="flex-1">
-            <ul className="space-y-6">
-              {cartItems.map((item) => (
-                <CartItem
-                  key={item._id}
-                  item={item}
-                  onIncrease={increaseQuantity}
-                  onDecrease={decreaseQuantity}
-                  onRemove={handleRemove}
-                />
-              ))}
-            </ul>
-          </div>
-
-          {/* Right - Delivery Form or Summary */}
-          <div className="w-full lg:w-1/3">
-            {showDeliveryForm ? (
-              <div className="space-y-4 bg-gray-50 dark:bg-gray-800 p-4 rounded shadow-md">
-                <h3 className="text-xl font-semibold">🏠 Delivery Address</h3>
-                {[
-                  { name: 'name', placeholder: 'Full Name' },
-                  { name: 'mobile', placeholder: 'Mobile Number', type: 'tel' },
-                  { name: 'pincode', placeholder: 'Pincode' },
-                  { name: 'state', placeholder: 'State' },
-                  { name: 'city', placeholder: 'City' },
-                ].map(({ name, placeholder, type = 'text' }) => (
-                  <input
-                    key={name}
-                    type={type}
-                    placeholder={placeholder}
-                    value={deliveryDetails[name]}
-                    onChange={(e) => setDeliveryDetails({ ...deliveryDetails, [name]: e.target.value })}
-                    className="w-full border p-2 rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+        {cartItems.length === 0 ? (
+          <p className="text-gray-600 dark:text-gray-400">Your cart is empty.</p>
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Left - Cart Items */}
+            <div className="flex-1">
+              <ul className="space-y-6">
+                {cartItems.map((item) => (
+                  <CartItem
+                    key={item._id}
+                    item={item}
+                    onIncrease={increaseQuantity}
+                    onDecrease={decreaseQuantity}
+                    onRemove={handleRemove}
                   />
                 ))}
-                <textarea
-                  placeholder="Flat / Area / Landmark"
-                  rows="3"
-                  value={deliveryDetails.address}
-                  onChange={(e) => setDeliveryDetails({ ...deliveryDetails, address: e.target.value })}
-                  className="w-full border p-2 rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
-                ></textarea>
+              </ul>
+            </div>
 
-                <select
-                  value={deliveryDetails.paymentMode}
-                  onChange={(e) => setDeliveryDetails({ ...deliveryDetails, paymentMode: e.target.value })}
-                  className="w-full border p-2 rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
-                >
-                  <option value="">Select Payment Mode</option>
-                  <option value="cod">Cash on Delivery</option>
-                  <option value="upi">Razorpay</option>
-                </select>
+            {/* Right - Delivery Form or Summary */}
+            <div className="w-full lg:w-1/3">
+              {showDeliveryForm ? (
+                <div className="space-y-4 bg-gray-50 dark:bg-gray-800 p-4 rounded shadow-md">
+                  <h3 className="text-xl font-semibold">🏠 Delivery Address</h3>
+                  {[
+                    { name: 'name', placeholder: 'Full Name' },
+                    { name: 'phoneNumber', placeholder: 'M-Pesa Phone (2547xxxxxxxx)', type: 'tel' },
+                    { name: 'address', placeholder: 'Full Address (Street, City, County)' },
+                  ].map(({ name, placeholder, type = 'text' }) => (
+                    <input
+                      key={name}
+                      type={type}
+                      placeholder={placeholder}
+                      value={deliveryDetails[name] || ''}
+                      onChange={(e) => setDeliveryDetails({ ...deliveryDetails, [name]: e.target.value })}
+                      className="w-full border p-2 rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+                    />
+                  ))}
+                  <select
+                    value={deliveryDetails.paymentMode}
+                    onChange={(e) => setDeliveryDetails({ ...deliveryDetails, paymentMode: e.target.value })}
+                    className="w-full border p-2 rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="">Select Payment Mode</option>
+                    <option value="cod">Cash on Delivery</option>
+                    <option value="mpesa">M-Pesa</option>
+                  </select>
 
-                <button
-                  onClick={handleFinalSubmit}
-                  className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition"
-                >
-                  Confirm Order
-                </button>
-              </div>
-            ) : (
-              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded shadow-md">
-                <h3 className="text-xl font-semibold mb-4">🧾 Order Summary</h3>
-                <p>Total Items: {totalItems}</p>
-                <p>Total Price: ₹{totalPrice}</p>
+                  <button
+                    onClick={handleFinalSubmit}
+                    className="w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition"
+                  >
+                    Confirm Order
+                  </button>
+                </div>
+              ) : (
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded shadow-md">
+                  <h3 className="text-xl font-semibold mb-4">🧾 Order Summary</h3>
+                  <p>Total Items: {totalItems}</p>
+                  <p>Total Price: KSH{totalPrice}</p>
 
-                <button
-                  className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-                  onClick={handlePlaceOrder}
-                >
-                  Place Order
-                </button>
-              </div>
-            )}
+                  <button
+                    className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+                    onClick={handlePlaceOrder}
+                  >
+                    Place Order
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
-
-      <ToastContainer
-        position="top-right"
-        autoClose={2000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+        )}
+        <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </div>
     </div>
   );

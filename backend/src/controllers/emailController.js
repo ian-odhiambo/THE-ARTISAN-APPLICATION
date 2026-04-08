@@ -19,19 +19,19 @@ export const sendOrderConfirmation = async (req, res) => {
     const { customerEmail, customerName, items, totalAmount, orderId, paymentMethod } = req.body;
 
     const itemsHtml = items
-      .map(item => `<li>${item.title} × ${item.quantity} — ₹${item.price * item.quantity}</li>`)
+      .map(item => `<li>${item.title} × ${item.quantity} — KSH${item.price * item.quantity}</li>`)
       .join('');
 
     const mailOptions = {
       from: process.env.MAIL_USER,
       to: customerEmail,
-      subject: '🧾 Order Confirmation - Desi-Etsy',
+      subject: '🧾 Order Confirmation - The Artisan Project',
       html: `
         <div style="font-family: Arial; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
           <h2 style="color: #cc5200;">Thank you for your order, ${customerName}!</h2>
           <p>Your order <strong>#${orderId}</strong> has been received and is being processed.</p>
-          <p><strong>Payment Method:</strong> ${paymentMethod || 'Razorpay (Online)'}</p>
-          <p><strong>Total Amount:</strong> ₹${totalAmount}</p>
+          <p><strong>Payment Method:</strong> ${paymentMethod || 'M-Pesa/COD'}</p>
+          <p><strong>Total Amount:</strong> KSH${totalAmount}</p>
           <h3 style="margin-top: 20px;">🛍️ Items Ordered:</h3>
           <ul>${itemsHtml}</ul>
           <hr />

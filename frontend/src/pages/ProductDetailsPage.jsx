@@ -57,7 +57,7 @@ const RecommendedProducts = ({ category, currentProductId }) => {
               </div>
               <h4 className="font-semibold text-lg mb-1 line-clamp-2">{product.title}</h4>
               <p className="text-indigo-600 dark:text-indigo-400 text-sm mb-2">{product.category}</p>
-              <p className="text-orange-600 dark:text-orange-400 font-bold text-lg">₹{product.price}</p>
+<p className="text-orange-600 dark:text-orange-400 font-bold text-lg">KSH{product.price}</p>
             </div>
           ))}
         </div>
@@ -173,16 +173,16 @@ const ProductDetailsPage = () => {
 
           {discountPercentage > 0 ? (
             <div className="flex flex-col">
-              <span className="text-gray-500 dark:text-gray-400 line-through text-lg">₹{product.price}</span>
-              <span className="text-red-600 font-bold text-xl">
-                ₹{Math.round(product.price * (1 - discountPercentage / 100))}
+<span className="text-gray-500 dark:text-gray-400 line-through text-lg">KSH{product.price}</span>
+<span className="text-red-600 font-bold text-xl">
+                KSH{Math.round(product.price * (1 - discountPercentage / 100))}
               </span>
               <span className="text-green-600 text-sm font-medium">
                 {discountPercentage}% OFF
               </span>
             </div>
           ) : (
-            <p className="text-xl text-gray-800 font-semibold dark:text-gray-200">₹{product.price}</p>
+<p className="text-xl text-gray-800 font-semibold dark:text-gray-200">KSH{product.price}</p>
           )}
           <p className="text-gray-700 dark:text-gray-300">{product.description}</p>
 
