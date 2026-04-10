@@ -101,6 +101,9 @@ const CartPage = () => {
     address: '',
     paymentMode: '',
   });
+  const [cartWarning, setCartWarning] = useState('');
+
+// No need for duplicate clean - handled in CartContext
 
   const rawUser = JSON.parse(localStorage.getItem('user')) || {};
   const user = { ...rawUser, _id: rawUser._id || rawUser.id };
@@ -114,7 +117,7 @@ const CartPage = () => {
     );
     toast.info('Quantity increased');
     setCartItems(updated);
-    localStorage.setItem('cart', JSON.stringify(updated));
+    localStorage.setItem('cartItems', JSON.stringify(updated));
   }, [cartItems, setCartItems]);
 
   const decreaseQuantity = useCallback((id) => {
@@ -123,13 +126,17 @@ const CartPage = () => {
     );
     toast.info('Quantity decreased');
     setCartItems(updated);
-    localStorage.setItem('cart', JSON.stringify(updated));
+    localStorage.setItem('cartItems', JSON.stringify(updated));
   }, [cartItems, setCartItems]);
 
   const saveOrder = async (paymentStatus) => {
     try {
+      if (cartItems.length === 0) {
+        toast.error('Cart empty');
+        return null;
+      }
+
       const orderData = {
-        userId: user._id,
         items: cartItems.map(item => ({
           productId: item._id,
           quantity: item.quantity,
@@ -139,6 +146,7 @@ const CartPage = () => {
         address: deliveryDetails.address,
         paymentStatus
       };
+      console.log('Sending orderData:', orderData);
 
       const response = await axios.post('http://localhost:5000/api/v1/orders', orderData, {
         headers: {
@@ -150,7 +158,7 @@ const CartPage = () => {
 
       toast.success(`Order placed successfully (${paymentStatus})`);
       setCartItems([]);
-      localStorage.removeItem('cart');
+      localStorage.removeItem('cartItems');
       setShowDeliveryForm(false);
 
       return savedOrder;
@@ -232,22 +240,20 @@ const CartPage = () => {
     if (paymentMode === 'cod') {
       try {
         const savedOrder = await saveOrder('Pending');
-        await axios.post('http://localhost:5000/api/v1/email/order-confirmation', {
-          orderId: savedOrder._id,
-          customerEmail: user.email,
-          customerName: user.name,
-          items: cartItems.map(item => ({
-            title: item.title,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-          totalAmount: totalPrice,
-          paymentMethod: 'Cash on Delivery'
-        }, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
+        if (savedOrder) {
+          await axios.post('http://localhost:5000/api/v1/email/order-confirmation', {
+            orderId: savedOrder._id,
+            customerEmail: user.email,
+            customerName: user.name,
+            items: cartItems.map(item => ({
+              title: item.title,
+              quantity: item.quantity,
+              price: item.price,
+            })),
+            totalAmount: totalPrice,
+            paymentMethod: 'Cash on Delivery'
+          }); // No auth for email
+        }
         toast.success('Order placed with COD! Check email.');
       } catch (error) {
         if (error.response?.status !== 500) throw error;

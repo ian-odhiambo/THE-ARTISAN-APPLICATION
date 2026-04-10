@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from './ProductCard';
 
-const NewArrivals = ({ products, isInWishlist, onWishlistToggle, onCategoryClick }) => {
+const NewArrivals = ({ products, isInWishlist, onWishlistToggle, onAddToCart, onCategoryClick }) => {
   const newArrivals = products.filter(p => p.isNewArrival).slice(0, 8);
 
   if (newArrivals.length === 0) return null;
@@ -28,6 +28,7 @@ const NewArrivals = ({ products, isInWishlist, onWishlistToggle, onCategoryClick
                 product={p}
                 isInWishlist={isInWishlist(p._id)}
                 onWishlistToggle={onWishlistToggle}
+                onAddToCart={onAddToCart}
                 onCategoryClick={onCategoryClick}
               />
             </div>

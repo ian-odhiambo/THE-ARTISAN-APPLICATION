@@ -32,7 +32,7 @@ export const register = async (req, res) => {
   try {
     console.log('[AuthController] Register attempt:', req.body.email);
     
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, phone } = req.body;
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -53,6 +53,7 @@ export const register = async (req, res) => {
       email,
       password: hashedPassword,
       role,
+      phone,
       isApproved: role === 'artisan' ? false : true
     });
 

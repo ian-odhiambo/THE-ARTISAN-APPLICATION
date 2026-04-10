@@ -34,7 +34,7 @@ export const getAllProducts = async (req, res) => {
   try {
     console.log('[ProductController] Get all approved products');
     
-const products = await Product.find({ isApproved: true }).sort({createdAt: -1}).populate('artisanId', 'name');
+const products = await Product.find({ isApproved: true }).sort({createdAt: -1}).populate('artisanId', 'name phone');
     res.status(200).json(products);
   } catch (err) {
     console.error('[ProductController] Get all error:', err);
@@ -54,6 +54,26 @@ export const getProductsByArtisan = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// Get Products by Category (case-insensitive, approved only)
+export const getProductsByCategory = async (req, res) => {
+  try {
+    const { categoryName } = req.params;
+    console.log('[ProductController] Get products for category:', categoryName);
+    
+    const products = await Product.find({ 
+      category: { $regex: new RegExp(categoryName, 'i') }, 
+      isApproved: true 
+    }).sort({ createdAt: -1 }).populate('artisanId', 'name phone');
+    
+    console.log(`Found ${products.length} products for category "${categoryName}"`);
+    res.status(200).json(products);
+  } catch (err) {
+    console.error('[ProductController] Get by category error:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 
 // Get Unapproved Products (Admin)
 export const getUnapprovedProducts = async (req, res) => {
@@ -130,10 +150,13 @@ export default {
   createProduct,
   getAllProducts,
   getProductsByArtisan,
+  getProductsByCategory,
   getUnapprovedProducts,
   approveProduct,
   updateProduct,
   deleteProduct,
   getProduct
 };
+
+
 

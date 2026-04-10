@@ -8,7 +8,8 @@ const RegisterPage = () => {
     name: '',
     email: '',
     password: '',
-    role: 'customer'
+    role: 'customer',
+    phone: ''
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -19,26 +20,49 @@ const RegisterPage = () => {
     if (password.length < 8) return 'Password must be at least 8 characters.';
     if (!/[A-Z]/.test(password)) return 'Password must include at least one uppercase letter.';
     if (!/[a-z]/.test(password)) return 'Password must include at least one lowercase letter.';
-if (!/\d/.test(password)) return 'Password must include at least one number.';
-if (!/[\W_]/.test(password)) return 'Password must include at least one special character.';
+    if (!/\d/.test(password)) return 'Password must include at least one number.';
+    if (!/[\W_]/.test(password)) return 'Password must include at least one special character.';
+    return '';
+  };
+
+  const getPhoneError = (phone) => {
+    if (phone) {
+      const clean = phone.replace(/[^0-9]/g, '');
+      if (clean.length < 9) return 'Phone too short';
+      const normalized = clean.startsWith('0') ? '254' + clean.slice(1) : clean;
+      if (!/^254[17]\d{8}$/.test(normalized)) return 'Invalid Kenyan phone (07/1xxxxxxxx)';
+    }
     return '';
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    console.log('Form submit:', form);
+
     const passwordError = getPasswordError(form.password);
     if (passwordError) {
       toast.error(passwordError);
       return;
     }
+    
+    const phoneError = getPhoneError(form.phone);
+    if (phoneError) {
+      toast.error(phoneError);
+      return;
+    }
 
     setLoading(true);
     try {
-await axios.post('http://localhost:5000/api/v1/auth/register', form);
+      const submitPhone = form.phone ? form.phone.replace(/[^0-9]/g, '').startsWith('0') ? '254' + form.phone.slice(1) : form.phone : '';
+      const submitData = { ...form, phone: submitPhone };
+      console.log('API call:', submitData);
+
+      const res = await axios.post('http://localhost:5000/api/v1/auth/register', submitData);
+      console.log('Success:', res.data);
       toast.success('Registration successful!');
-      setTimeout(() => navigate('/login'), 2000);
+      setTimeout(() => navigate('/login'), 1500);
     } catch (err) {
-      console.error('Register error:', err);
+      console.error('Register error:', err.response?.data || err);
       toast.error(err.response?.data?.error || err.message || 'Registration failed');
     } finally {
       setLoading(false);
@@ -91,6 +115,10 @@ await axios.post('http://localhost:5000/api/v1/auth/register', form);
             <p className="text-sm text-red-600 dark:text-red-400">{getPasswordError(form.password)}</p>
           )}
 
+          {form.phone && getPhoneError(form.phone) && (
+            <p className="text-sm text-red-600 dark:text-red-400">{getPhoneError(form.phone)}</p>
+          )}
+
           <select
             value={form.role}
             onChange={e => setForm({ ...form, role: e.target.value })}
@@ -99,6 +127,14 @@ await axios.post('http://localhost:5000/api/v1/auth/register', form);
             <option value="customer">Customer</option>
             <option value="artisan">Artisan</option>
           </select>
+
+          <input
+            type="tel"
+            placeholder="Phone (07xxxxxxxx or 2547xxxxxxxx)"
+            value={form.phone}
+            onChange={e => setForm({ ...form, phone: e.target.value })}
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+          />
 
           <button
             type="submit"

@@ -41,6 +41,7 @@ const ProductCard = React.memo(({ product, isInWishlist, onWishlistToggle, onCat
             e.preventDefault();
             e.stopPropagation();
             onWishlistToggle(product);
+            onAddToCart(product);
           }}
           className="absolute top-3 right-3 z-10 p-2 bg-white dark:bg-gray-700 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
           aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
@@ -98,13 +99,13 @@ const ProductCard = React.memo(({ product, isInWishlist, onWishlistToggle, onCat
           <div className="flex justify-between items-center mt-3">
             {product.discountPercentage > 0 ? (
               <div className="flex flex-col">
-                <span className="text-gray-500 dark:text-gray-400 line-through text-sm">₹{product.price}</span>
+
                 <span className="text-red-600 font-bold text-lg">
-                  ₹{Math.round(product.price * (1 - product.discountPercentage / 100))}
+                  KSH {Math.round(product.price * (1 - product.discountPercentage / 100))}
                 </span>
               </div>
             ) : (
-              <span className="text-orange-600 font-bold text-lg">₹{product.price}</span>
+              <span className="text-orange-600 font-bold text-lg">KSH {product.price}</span>
             )}
             <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
               <FiTruck className="mr-1" /> Free delivery

@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo, useCallback, useContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useWishlist } from "../context/WishlistContext";
+import { useCart } from "../context/CartContext";
 
 import Navigation from "../components/homepage-subcomponents/Navigation";
 import WhoWeAre from "../components/homepage-subcomponents/WhoWeAre";
@@ -25,6 +26,7 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
 
   const { wishlistItems, addToWishlist, removeFromWishlist } = useWishlist();
+  const { addToCart } = useCart();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user")) || null;
 
@@ -37,13 +39,13 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
         const res = await axios.get(`${apiUrl}/products`);
         console.log("API Response:", res.data.length, "products");
 
-        const productsWithAttributes = res.data.map((product, index) => ({
+        const productsWithAttributes = res.data.map((product) => ({
           ...product,
           rating: 4.5,
           reviews: 24,
-          isTopSeller: index === 0,
-          discountPercentage: index === 1 ? 15 : 0,
-          isNewArrival: index === 1,
+          isTopSeller: Math.random() < 0.1,
+          discountPercentage: Math.random() < 0.3 ? Math.floor(Math.random() * 30) + 10 : 0,
+          isNewArrival: Math.random() < 0.2
         }));
         console.log("Processed products:", productsWithAttributes);
         setProducts(productsWithAttributes);
@@ -107,6 +109,23 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
     [isInWishlist, addToWishlist, removeFromWishlist],
   );
 
+  const handleAddToCart = useCallback((product) => {
+    if (!user) {
+      toast.info('Please login to add to cart');
+      navigate('/login');
+      return;
+    }
+    const discountedPrice = product.discountPercentage > 0 ? Math.round(product.price * (1 - product.discountPercentage / 100)) : product.price;
+    addToCart({
+      ...product,
+      price: discountedPrice,
+      originalPrice: product.price,
+      discountPercentage: product.discountPercentage || 0,
+      quantity: 1
+    });
+    toast.success('Added to cart!');
+  }, [addToCart, user, navigate]);
+
   const handleCategoryClick = (cat) => {
     navigate(`/category/${cat}`);
     setMobileMenuOpen(false);
@@ -141,18 +160,21 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
             products={products}
             isInWishlist={isInWishlist}
             onWishlistToggle={handleWishlistToggle}
+            onAddToCart={handleAddToCart}
             onCategoryClick={handleCategoryClick}
           />
           <SpecialDiscounts
             products={products}
             isInWishlist={isInWishlist}
             onWishlistToggle={handleWishlistToggle}
+            onAddToCart={handleAddToCart}
             onCategoryClick={handleCategoryClick}
           />
           <NewArrivals
             products={products}
             isInWishlist={isInWishlist}
             onWishlistToggle={handleWishlistToggle}
+            onAddToCart={handleAddToCart}
             onCategoryClick={handleCategoryClick}
           />
         </div>
@@ -167,6 +189,7 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
           loading={loading}
           isInWishlist={isInWishlist}
           onWishlistToggle={handleWishlistToggle}
+          onAddToCart={handleAddToCart}
           onCategoryClick={handleCategoryClick}
         />
       </div>

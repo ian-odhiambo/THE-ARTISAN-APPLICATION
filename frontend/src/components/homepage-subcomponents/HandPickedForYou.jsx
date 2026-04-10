@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from './ProductCard';
 
-const HandPickedForYou = ({ filteredProducts, loading, isInWishlist, onWishlistToggle, onCategoryClick }) => {
+const HandPickedForYou = ({ filteredProducts, loading, isInWishlist, onWishlistToggle, onAddToCart, onCategoryClick }) => {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -38,6 +38,7 @@ const HandPickedForYou = ({ filteredProducts, loading, isInWishlist, onWishlistT
               product={p}
               isInWishlist={isInWishlist(p._id)}
               onWishlistToggle={onWishlistToggle}
+              onAddToCart={onAddToCart}
               onCategoryClick={onCategoryClick}
             />
           </div>

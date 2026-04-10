@@ -9,9 +9,12 @@ import { createProduct } from '../../controllers/productController.js';
 
 router.post('/', createProduct);
 
-import { getAllProducts } from '../../controllers/productController.js';
+import { getAllProducts, getProductsByCategory } from '../../controllers/productController.js';
 
 router.get('/', getAllProducts);
+
+// Get products by category (case-insensitive)
+router.get('/category/:categoryName', getProductsByCategory);
 
 // Get products by artisan ID
 router.get('/artisan/:artisanId', async (req, res) => {
@@ -22,6 +25,7 @@ router.get('/artisan/:artisanId', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 // Get unapproved products (admin use)
 router.get('/unapproved', async (req, res) => {

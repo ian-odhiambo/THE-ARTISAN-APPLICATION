@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import ProductCard from './ProductCard';
 
-const SpecialDiscounts = ({ products, isInWishlist, onWishlistToggle, onCategoryClick }) => {
+const SpecialDiscounts = ({ products, isInWishlist, onWishlistToggle, onAddToCart, onCategoryClick }) => {
   const discountedProducts = products.filter(p => p.discountPercentage > 0).slice(0, 8);
 
   if (discountedProducts.length === 0) return null;
@@ -28,6 +28,7 @@ const SpecialDiscounts = ({ products, isInWishlist, onWishlistToggle, onCategory
                 product={p}
                 isInWishlist={isInWishlist(p._id)}
                 onWishlistToggle={onWishlistToggle}
+                onAddToCart={onAddToCart}
                 onCategoryClick={onCategoryClick}
               />
             </div>

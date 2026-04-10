@@ -6,11 +6,32 @@ export const useCart = () => useContext(CartContext);
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
 
-  // Load cart from localStorage on mount
+  // Load cart from localStorage on mount - robust
   useEffect(() => {
     const savedCart = localStorage.getItem('cartItems');
     if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
+      try {
+        const parsed = JSON.parse(savedCart);
+        if (Array.isArray(parsed)) {
+          const validItems = parsed.filter(item => 
+            item && 
+            typeof item === 'object' &&
+            item._id && 
+            typeof item._id === 'string' && 
+            item._id.length === 24
+          );
+          if (validItems.length !== parsed.length) {
+            console.log('Cart cleaned:', validItems.length, '/', parsed.length);
+            localStorage.setItem('cartItems', JSON.stringify(validItems));
+          }
+          setCartItems(validItems);
+        } else {
+          console.warn('Cart not array:', parsed);
+        }
+      } catch (e) {
+        console.error('Corrupt cart JSON:', e);
+        localStorage.removeItem('cartItems');
+      }
     }
   }, []);
 

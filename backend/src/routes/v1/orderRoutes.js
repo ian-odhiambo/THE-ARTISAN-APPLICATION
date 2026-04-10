@@ -1,4 +1,5 @@
 import express from "express";
+import mongoose from "mongoose";
 import Order from "../../models/Order.js";
 import Product from "../../models/Product.js";
 import authMiddleware from "../../middleware/auth.js";
@@ -18,10 +19,14 @@ router.post("/", authMiddleware, async (req, res) => {
   });
 
   try {
+    // Bypass validation for testing - DB has bad _id
+    console.log('Product IDs:', items.map(i => i.productId));
+
     const populatedItems = await Promise.all(
       items.map(async (item) => {
         const product = await Product.findById(item.productId);
         if (!product) throw new Error(`Product not found: ${item.productId}`);
+        if (!product.artisanId) throw new Error(`Product ${item.productId} has no artisan`);
         return {
           productId: item.productId,
           quantity: item.quantity,
