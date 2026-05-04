@@ -15,7 +15,7 @@ const CategoryPage = () => {
       try {
         setLoading(true);
         setError(null);
-        const apiUrl = 'http://localhost:5000/api/v1';
+        const apiUrl = '/api/v1';
 
         const endpoint = categoryName === 'all' 
           ? '/products' 

@@ -16,7 +16,7 @@ const ProfilePage = ({ darkMode }) => {
         const storedUser = JSON.parse(localStorage.getItem('user'));
         if (storedUser) {
           // Fetch updated user data from backend
-          const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/profile`, {
+          const res = await axios.get('/api/v1/auth/profile', {
             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
           });
           setUser(res.data);
@@ -63,7 +63,7 @@ const ProfilePage = ({ darkMode }) => {
     setUpdating(true);
     try {
       const res = await axios.put(
-        `${process.env.REACT_APP_API_URL}/auth/profile`,
+        '/api/v1/auth/profile',
         editForm,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }

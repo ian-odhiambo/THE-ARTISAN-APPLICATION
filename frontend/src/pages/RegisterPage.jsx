@@ -57,7 +57,7 @@ const RegisterPage = () => {
       const submitData = { ...form, phone: submitPhone };
       console.log('API call:', submitData);
 
-      const res = await axios.post('http://localhost:5000/api/v1/auth/register', submitData);
+      const res = await axios.post('/api/v1/auth/register', submitData);
       console.log('Success:', res.data);
       toast.success('Registration successful!');
       setTimeout(() => navigate('/login'), 1500);

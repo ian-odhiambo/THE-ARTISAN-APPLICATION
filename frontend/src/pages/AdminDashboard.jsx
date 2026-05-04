@@ -25,8 +25,8 @@ const AdminDashboard = ({ darkMode }) => {
 
   const fetchAllArtisans = async () => {
     try {
-      console.log('Fetching all artisans from: http://localhost:5000/api/v1/admin/artisans');
-      const res = await axios.get('http://localhost:5000/api/v1/admin/artisans');
+      console.log('Fetching all artisans from: /api/v1/admin/artisans');
+      const res = await axios.get('/api/v1/admin/artisans');
       console.log('Artisans loaded:', res.data.length);
       setAllArtisans(res.data);
     } catch (err) {
@@ -38,7 +38,7 @@ const AdminDashboard = ({ darkMode }) => {
   const fetchAllProducts = async () => {
     try {
       console.log('Fetching all products...');
-      const res = await axios.get(`http://localhost:5000/api/v1/admin/products`);
+      const res = await axios.get('/api/v1/admin/products');
       setAllProducts(res.data);
     } catch (err) {
       console.error('Fetch products error:', err);
@@ -49,7 +49,7 @@ const AdminDashboard = ({ darkMode }) => {
   const fetchStats = async () => {
     try {
       console.log('Fetching admin stats...');
-      const res = await axios.get('http://localhost:5000/api/v1/admin/stats');
+      const res = await axios.get('/api/v1/admin/stats');
       setStats(res.data);
     } catch (err) {
       console.error('Stats fetch failed:', err.response?.status, err.message);
@@ -95,7 +95,7 @@ const AdminDashboard = ({ darkMode }) => {
 
   const fetchUnapprovedProducts = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/v1/products/unapproved');
+      const res = await axios.get('/api/v1/products/unapproved');
       console.log('Unapproved products:', res.data.length);
       setProducts(res.data);
     } catch (err) {
@@ -106,7 +106,7 @@ const AdminDashboard = ({ darkMode }) => {
   const fetchUnapprovedArtisans = async () => {
     try {
       console.log('Fetching unapproved artisans...');
-      const res = await axios.get(`http://localhost:5000/api/v1/admin/unapproved-artisans`);
+      const res = await axios.get('/api/v1/admin/unapproved-artisans');
       setUnapprovedArtisans(res.data);
     } catch (err) {
       console.error('Fetch unapproved artisans error:', err);
@@ -117,7 +117,7 @@ const AdminDashboard = ({ darkMode }) => {
   const handleApproveProduct = async (id) => {
     try {
       console.log('=== APPROVING PRODUCT === ID:', id);
-      const response = await axios.patch(`http://localhost:5000/api/v1/products/approve/${id}`, { isApproved: true });
+      const response = await axios.patch(`/api/v1/products/approve/${id}`, { isApproved: true });
       console.log('Approve response:', response.status, response.data);
       toast.success('Product approved ✅');
       fetchUnapprovedProducts();
@@ -134,7 +134,7 @@ const AdminDashboard = ({ darkMode }) => {
   const handleRejectProduct = async (id) => {
     if (window.confirm('Are you sure you want to reject this product?')) {
       try {
-        await axios.delete(`${process.env.REACT_APP_API_URL}/products/${id}`);
+      await axios.delete(`/api/v1/products/${id}`);
         toast.error('Product rejected ❌');
         fetchUnapprovedProducts();
       } catch (err) {
@@ -146,7 +146,7 @@ const AdminDashboard = ({ darkMode }) => {
   const handleApproveArtisan = async (id) => {
     try {
       console.log('Approving artisan ID:', id);
-      await axios.patch(`http://localhost:5000/api/v1/admin/approve-artisan/${id}`);
+      await axios.patch(`/api/v1/admin/approve-artisan/${id}`);
       toast.success('Artisan approved ✅');
       fetchAllArtisans();
       fetchUnapprovedArtisans();
@@ -160,7 +160,7 @@ const AdminDashboard = ({ darkMode }) => {
     if (window.confirm('Are you sure you want to reject this artisan?')) {
       try {
         console.log('Rejecting artisan:', id);
-        await axios.delete(`http://localhost:5000/api/v1/admin/reject-artisan/${id}`);
+        await axios.delete(`/api/v1/admin/reject-artisan/${id}`);
         toast.error('Artisan rejected ❌');
         fetchAllArtisans();
         fetchUnapprovedArtisans();

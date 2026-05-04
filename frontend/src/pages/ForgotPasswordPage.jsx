@@ -23,7 +23,7 @@ const ForgotPasswordPage = () => {
 
     setLoading(true);
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/auth/forgot-password`, { email });
+      await axios.post('/api/v1/auth/forgot-password', { email });
       setSubmitted(true);
       toast.success("Reset link sent (if email exists)");
       setTimeout(() => navigate("/login"), 2000);

@@ -3,8 +3,8 @@ import { FaGoogle } from 'react-icons/fa';
 const GoogleRoleSelection = ({ onRoleSelect }) => {
   const handleGoogleLogin = () => {
     // Use BACKEND_URL instead of API_URL
-const backendUrl = 'http://localhost:5000';
-    window.location.href = `${backendUrl}/api/auth/google`;
+const backendUrl = '';
+    window.location.href = `${backendUrl}/api/v1/auth/google`;
   };
 
   return (

@@ -148,7 +148,7 @@ const CartPage = () => {
       };
       console.log('Sending orderData:', orderData);
 
-      const response = await axios.post('http://localhost:5000/api/v1/orders', orderData, {
+      const response = await axios.post('/api/v1/orders', orderData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -186,7 +186,7 @@ const CartPage = () => {
         return;
       }
 
-      const response = await axios.post('http://localhost:5000/api/v1/payment/order', {
+      const response = await axios.post('/api/v1/payment/order', {
         amount: totalPrice,
         phoneNumber: deliveryDetails.phoneNumber,
         orderItems: cartItems.map(item => ({
@@ -241,7 +241,7 @@ const CartPage = () => {
       try {
         const savedOrder = await saveOrder('Pending');
         if (savedOrder) {
-          await axios.post('http://localhost:5000/api/v1/email/order-confirmation', {
+          await axios.post('/api/v1/email/order-confirmation', {
             orderId: savedOrder._id,
             customerEmail: user.email,
             customerName: user.name,

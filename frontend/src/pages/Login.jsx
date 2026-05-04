@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import GoogleRoleSelection from '../components/GoogleRoleSelection';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import GoogleRoleSelection from "../components/GoogleRoleSelection";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const LoginPage = () => {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast.error('Please enter a valid email address.');
+      toast.error("Please enter a valid email address.");
       return;
     }
 
@@ -26,28 +26,35 @@ const LoginPage = () => {
     try {
       const trimmedEmail = email.trim();
       const trimmedPassword = password.trim();
-      const res = await axios.post('http://localhost:5000/api/v1/auth/login', {
+      const res = await axios.post("/api/v1/auth/login", {
         email: trimmedEmail,
         password: trimmedPassword,
       });
 
-      localStorage.setItem('token', res.data.token);
+      localStorage.setItem("token", res.data.token);
       localStorage.setItem(
-        'user',
-        JSON.stringify({ ...res.data.user, _id: res.data.user._id || res.data.user.id })
+        "user",
+        JSON.stringify({
+          ...res.data.user,
+          _id: res.data.user._id || res.data.user.id,
+        }),
       );
 
-      toast.success('Login successful!');
+      toast.success("Login successful!");
 
       setTimeout(() => {
         const role = res.data.user.role;
-        if (role === 'admin') navigate('/admin/dashboard');
-        else if (role === 'artisan') navigate('/artisan/dashboard');
-        else navigate('/');
+        if (role === "admin") navigate("/admin/dashboard");
+        else if (role === "artisan") navigate("/artisan/dashboard");
+        else navigate("/");
       }, 1000);
     } catch (err) {
-      console.error('Login error:', err);
-      toast.error(err.response?.data?.message || err.response?.data?.error || 'Login failed. Please check your credentials.');
+      console.error("Login error:", err);
+      toast.error(
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Login failed. Please check your credentials.",
+      );
     } finally {
       setLoading(false);
     }
@@ -55,9 +62,9 @@ const LoginPage = () => {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    const user = urlParams.get('user');
-    const error = urlParams.get('error');
+    const token = urlParams.get("token");
+    const user = urlParams.get("user");
+    const error = urlParams.get("error");
 
     if (error) {
       toast.error(`Google authentication failed: ${error}`);
@@ -67,19 +74,27 @@ const LoginPage = () => {
 
     if (token && user) {
       try {
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', decodeURIComponent(user));
-        toast.success('Google login successful!');
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", decodeURIComponent(user));
+        toast.success("Google login successful!");
         const userObj = JSON.parse(decodeURIComponent(user));
         const role = userObj.role;
-        if (role === 'admin') navigate('/admin/dashboard');
-        else if (role === 'artisan') navigate('/artisan/dashboard');
-        else navigate('/');
-        window.history.replaceState({}, document.title, window.location.pathname);
+        if (role === "admin") navigate("/admin/dashboard");
+        else if (role === "artisan") navigate("/artisan/dashboard");
+        else navigate("/");
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname,
+        );
       } catch (err) {
-        console.error('Error processing Google callback:', err);
-        toast.error('Error processing authentication response');
-        window.history.replaceState({}, document.title, window.location.pathname);
+        console.error("Error processing Google callback:", err);
+        toast.error("Error processing authentication response");
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname,
+        );
       }
     }
   }, [navigate]);
@@ -87,8 +102,12 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-100 to-pink-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center px-4">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold text-center text-orange-600 dark:text-orange-400 mb-2">Welcome Back 👋</h2>
-        <p className="text-center text-gray-600 dark:text-gray-400 mb-6">Please login to continue</p>
+        <h2 className="text-2xl font-bold text-center text-orange-600 dark:text-orange-400 mb-2">
+          Welcome Back 👋
+        </h2>
+        <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
+          Please login to continue
+        </p>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <input
@@ -102,7 +121,7 @@ const LoginPage = () => {
 
           <div className="relative">
             <input
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -115,14 +134,19 @@ const LoginPage = () => {
               role="button"
               aria-label="Toggle Password Visibility"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setShowPassword((prev) => !prev)}
+              onKeyDown={(e) =>
+                e.key === "Enter" && setShowPassword((prev) => !prev)
+              }
             >
-              {showPassword ? '🙈' : '👁️'}
+              {showPassword ? "🙈" : "👁️"}
             </span>
           </div>
 
           <div className="flex justify-between text-sm">
-            <Link to="/forgot-password" className="text-orange-600 dark:text-orange-400 hover:underline">
+            <Link
+              to="/forgot-password"
+              className="text-orange-600 dark:text-orange-400 hover:underline"
+            >
               Forgot Password?
             </Link>
           </div>
@@ -131,10 +155,10 @@ const LoginPage = () => {
             type="submit"
             disabled={loading}
             className={`w-full bg-orange-600 hover:bg-orange-700 text-white py-2 rounded font-semibold transition ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
+              loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
@@ -143,8 +167,11 @@ const LoginPage = () => {
         </div>
 
         <p className="text-sm text-center mt-6 text-gray-600 dark:text-gray-400">
-          New user?{' '}
-          <Link to="/register" className="text-orange-600 dark:text-orange-400 hover:underline">
+          New user?{" "}
+          <Link
+            to="/register"
+            className="text-orange-600 dark:text-orange-400 hover:underline"
+          >
             Register here
           </Link>
         </p>
@@ -156,4 +183,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-

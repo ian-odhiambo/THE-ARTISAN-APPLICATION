@@ -34,7 +34,7 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const apiUrl = "http://localhost:5000/api/v1";
+        const apiUrl = "/api/v1";
         console.log("Fetching products from:", `${apiUrl}/products`);
         const res = await axios.get(`${apiUrl}/products`);
         console.log("API Response:", res.data.length, "products");
