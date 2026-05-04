@@ -14,7 +14,7 @@ const MyOrdersPage = ({ darkMode }) => {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const res = await axios.get(`/api/v1/orders/user/${user._id}`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/orders/user/${user._id}`);
       setOrders(res.data);
     } catch (err) {
       toast.error('Failed to fetch orders');
@@ -23,7 +23,7 @@ const MyOrdersPage = ({ darkMode }) => {
 
   const handleCancel = async (orderId) => {
     try {
-      const res = await axios.put(`/api/v1/orders/${orderId}/cancel`);
+      const res = await axios.put(`${process.env.REACT_APP_API_URL}/orders/${orderId}/cancel`);
       toast.success(res.data.message || 'Order cancelled successfully');
       fetchOrders();
     } catch (err) {

@@ -31,7 +31,7 @@ const EmailOtpForm = ({ onVerified }) => {
     }
 
     try {
-      await axios.post('/api/v1/otp/send-email-otp', { email });
+      await axios.post(`${process.env.REACT_APP_API_URL}/otp/send-email-otp`, { email });
       toast.success('OTP sent to your email');
       setShowOtpInput(true);
       setTimer(60);
@@ -48,7 +48,7 @@ const EmailOtpForm = ({ onVerified }) => {
 
     setLoading(true);
     try {
-      const res = await axios.post('/api/v1/otp/verify-email-otp', { email, otp });
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/otp/verify-email-otp`, { email, otp });
       if (res.data.verified) {
         toast.success('Email verified ✅');
         onVerified(email);
