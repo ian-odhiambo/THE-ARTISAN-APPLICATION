@@ -91,8 +91,17 @@ app.use("/api/v1/orders", orderRoutes);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/email", emailRoutes);
 
-// Serve frontend build from backend when available
-// if(process.env.NODE_ENV === "production") {\n//   app.use(express.static(path.join(__dirname, "../frontend/dist")));\n//\n//   app.get('*', (req, res) => {\n//     if (req.path.startsWith('/api/')) {\n//       return res.status(404).json({ message: 'API route not found' });\n//     }\n//     res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));\n//   });\n// }\n\n// TODO: Re-enable after confirming API works on Render (Node 24 path-to-regexp issue)
+// Serve frontend build from backend when available (Render-safe)
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+  app.get("*", (req, res) => {
+    if (req.path.startsWith("/api/")) {
+      return res.status(404).json({ error: "Use API endpoint" });
+    }
+    res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
+  });
+}
 
 // MongoDB Connection
 console.log(
