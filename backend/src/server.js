@@ -33,8 +33,8 @@ console.log("Server started with key:", global.serverKey);
 // CORS setup
 if (process.env.NODE !== "production") {
   const allowedOrigins = process.env.CORS_ORIGINS
-  ? process.env.CORS_ORIGINS.split(',')
-  : ["http://localhost:5173", "http://localhost:5174"];
+    ? process.env.CORS_ORIGINS.split(",")
+    : ["http://localhost:5173", "http://localhost:5174"];
   app.use(
     cors({
       origin: allowedOrigins,
@@ -92,16 +92,7 @@ app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/email", emailRoutes);
 
 // Serve frontend build from backend when available
-if(process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-  app.get('*', (req, res) => {
-    if (req.path.startsWith('/api/')) {
-      return res.status(404).json({ message: 'API route not found' });
-    }
-    res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
-  });
-}
+// if(process.env.NODE_ENV === "production") {\n//   app.use(express.static(path.join(__dirname, "../frontend/dist")));\n//\n//   app.get('*', (req, res) => {\n//     if (req.path.startsWith('/api/')) {\n//       return res.status(404).json({ message: 'API route not found' });\n//     }\n//     res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));\n//   });\n// }\n\n// TODO: Re-enable after confirming API works on Render (Node 24 path-to-regexp issue)
 
 // MongoDB Connection
 console.log(
@@ -122,4 +113,3 @@ mongoose
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
