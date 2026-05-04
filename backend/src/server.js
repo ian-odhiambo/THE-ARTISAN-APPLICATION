@@ -79,9 +79,9 @@ passport.deserializeUser(async (id, done) => {
 // Middleware
 app.use(express.json());
 
-// Production: Serve frontend FIRST (before API routes)
+// Serve frontend FIRST in production - Render path fix
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  app.use(express.static(path.join(process.cwd(), "frontend/dist")));
 }
 
 // API Routes
@@ -93,15 +93,15 @@ app.use("/api/v1/orders", orderRoutes);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/email", emailRoutes);
 
-// Production: SPA catch-all (regex-safe, no '*')
+// SPA catch-all for production (regex safe)
 if (process.env.NODE_ENV === "production") {
   app.get(/^\/(?!api\/)/, (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
+    res.sendFile(path.join(process.cwd(), "frontend/dist/index.html"));
   });
 }
 
-// Health check (last)
-app.get("/", (req, res) => res.json({ message: "The Artisan API - Frontend served at root in production" }));
+// Health check LAST
+app.get("/", (req, res) => res.json({ message: "The Artisan fullstack app - Frontend at root, API at /api/v1/*" }));
 
 // MongoDB Connection
 console.log(
