@@ -79,22 +79,12 @@ passport.deserializeUser(async (id, done) => {
 // Middleware
 app.use(express.json());
 
-// Serve frontend build from backend when available (MUST be before API routes)
+// Production: Serve frontend FIRST (before API routes)
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
-  
-  app.get("*", (req, res) => {
-    if (req.path.match(/^\/api\//)) {
-      return res.status(404).json({ error: "API endpoint not found" });
-    }
-    res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
-  });
 }
 
-// Health check route (after frontend serving)
-app.get("/", (req, res) => res.send("Backend API is running! Use /api/v1/* endpoints"));
-
-// API Routes (after frontend static)
+// API Routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/admin", adminRoutes);
@@ -102,6 +92,16 @@ app.use("/api/v1/otp", emailOtpRoutes);
 app.use("/api/v1/orders", orderRoutes);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/email", emailRoutes);
+
+// Production: SPA catch-all (regex-safe, no '*')
+if (process.env.NODE_ENV === "production") {
+  app.get(/^\/(?!api\/)/, (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
+  });
+}
+
+// Health check (last)
+app.get("/", (req, res) => res.json({ message: "The Artisan API - Frontend served at root in production" }));
 
 // MongoDB Connection
 console.log(
