@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
+import React, { useState, useRef, useCallback } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
@@ -8,61 +7,60 @@ import AllArtisans from '../components/admindashboard-subcomponents/AllArtisans'
 import AllProducts from '../components/admindashboard-subcomponents/AllProducts';
 import PendingProducts from '../components/admindashboard-subcomponents/PendingProducts';
 import PendingArtisans from '../components/admindashboard-subcomponents/PendingArtisans';
+import {
+  useFetchArtisans,
+  useFetchProducts,
+  useFetchStats,
+  useProductActions,
+  useArtisanActions,
+  useClickOutside
+} from '../components/hooks';
 
 const AdminDashboard = ({ darkMode }) => {
   const [activeTab, setActiveTab] = useState('stats');
-  const [products, setProducts] = useState([]);
-  const [unapprovedArtisans, setUnapprovedArtisans] = useState([]);
-  const [allArtisans, setAllArtisans] = useState([]);
-  const [allProducts, setAllProducts] = useState([]);
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
 
-  //This is fetching of all the artisans who created account
-  const fetchAllArtisans = async () => {
-    try {
-      console.log('Fetching all artisans from: http://localhost:5000/api/v1/admin/artisans');
-      const res = await axios.get('http://localhost:5000/api/v1/admin/artisans');
-      console.log('Artisans loaded:', res.data.length);
-      setAllArtisans(res.data);
-    } catch (err) {
-      console.error('All artisans fetch failed:', err.response?.status, err.message);
-      toast.error('Failed to fetch all artisans');
-    }
-  };
+  // Import custom hooks
+  const { allArtisans, fetchAllArtisans } = useFetchArtisans();
+  const { 
+    products, 
+    allProducts, 
+    fetchAllProducts, 
+    fetchUnapprovedProducts 
+  } = useFetchProducts();
+  const { stats, fetchStats } = useFetchStats();
 
-  //This code fetches all the products under the artisan who created the product
-  const fetchAllProducts = async () => {
+  // Fetch unapproved artisans
+  const [unapprovedArtisans, setUnapprovedArtisans] = useState([]);
+  const fetchUnapprovedArtisans = useCallback(async () => {
     try {
-      console.log('Fetching all products...');
-      const res = await axios.get(`http://localhost:5000/api/v1/admin/products`);
-      setAllProducts(res.data);
+      console.log('Fetching unapproved artisans...');
+      const res = await fetch('http://localhost:5000/api/v1/admin/unapproved-artisans');
+      const data = await res.json();
+      setUnapprovedArtisans(data);
     } catch (err) {
-      console.error('Fetch products error:', err);
-      toast.error('Failed to fetch all products');
+      console.error('Fetch unapproved artisans error:', err);
+      toast.error('Failed to fetch artisans');
     }
-  };
+  }, []);
 
-  //This code fetches statistics
-  const fetchStats = async () => {
-    try {
-      console.log('Fetching admin stats...');
-      const res = await axios.get('http://localhost:5000/api/v1/admin/stats');
-      setStats(res.data);
-    } catch (err) {
-      console.error('Stats fetch failed:', err.response?.status, err.message);
-      toast.error('Failed to fetch stats');
-    }
-  };
+  // Action hooks
+  const { handleApproveArtisan, handleRejectArtisan } = useArtisanActions(
+    fetchAllArtisans,
+    fetchUnapprovedArtisans
+  );
+  const { handleApproveProduct, handleRejectProduct } = useProductActions(
+    fetchUnapprovedProducts,
+    fetchAllProducts
+  );
 
-  useEffect(() => {
+  // Initial data loading
+  React.useEffect(() => {
     const loadAllData = async () => {
-      setLoading(true);
       await Promise.all([
         fetchUnapprovedProducts(),
         fetchUnapprovedArtisans(),
@@ -70,20 +68,12 @@ const AdminDashboard = ({ darkMode }) => {
         fetchAllProducts(),
         fetchStats()
       ]);
-      setLoading(false);
     };
     loadAllData();
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  // Click outside handler for dropdown
+  useClickOutside(dropdownRef, () => setShowDropdown(false));
 
   const handleLogout = () => {
     localStorage.removeItem('user');
@@ -94,84 +84,6 @@ const AdminDashboard = ({ darkMode }) => {
   const handleUpdatePassword = () => {
     setShowDropdown(false);
     navigate('/update-password');
-  };
-
-  const fetchUnapprovedProducts = async () => {
-    try {
-      const res = await axios.get('http://localhost:5000/api/v1/products/unapproved');
-      console.log('Unapproved products:', res.data.length);
-      setProducts(res.data);
-    } catch (err) {
-      toast.error('Failed to fetch products');
-    }
-  };
-
-  const fetchUnapprovedArtisans = async () => {
-    try {
-      console.log('Fetching unapproved artisans...');
-      const res = await axios.get(`http://localhost:5000/api/v1/admin/unapproved-artisans`);
-      setUnapprovedArtisans(res.data);
-    } catch (err) {
-      console.error('Fetch unapproved artisans error:', err);
-      toast.error('Failed to fetch artisans');
-    }
-  };
-
-  const handleApproveProduct = async (id) => {
-    try {
-      console.log('=== APPROVING PRODUCT === ID:', id);
-      const response = await axios.patch(`http://localhost:5000/api/v1/products/approve/${id}`, { isApproved: true });
-      console.log('Approve response:', response.status, response.data);
-      toast.success('Product approved ✅');
-      fetchUnapprovedProducts();
-      fetchAllProducts();
-    } catch (err) {
-      console.error('=== APPROVE ERROR ===');
-      console.error('Status:', err.response?.status);
-      console.error('Data:', err.response?.data);
-      console.error('Message:', err.message);
-      toast.error(`Error approving product (${err.response?.status || 'Unknown'})`);
-    }
-  };
-
-  const handleRejectProduct = async (id) => {
-    if (window.confirm('Are you sure you want to reject this product?')) {
-      try {
-        await axios.delete(`${process.env.REACT_APP_API_URL}/products/${id}`);
-        toast.error('Product rejected ❌');
-        fetchUnapprovedProducts();
-      } catch (err) {
-        toast.error('Error rejecting product');
-      }
-    }
-  };
-
-  const handleApproveArtisan = async (id) => {
-    try {
-      console.log('Approving artisan ID:', id);
-      await axios.patch(`http://localhost:5000/api/v1/admin/approve-artisan/${id}`);
-      toast.success('Artisan approved ✅');
-      fetchAllArtisans();
-      fetchUnapprovedArtisans();
-    } catch (err) {
-      console.error('Approve failed:', err.response?.status, err.response?.data || err.message);
-      toast.error('Error approving artisan');
-    }
-  };
-
-  const handleRejectArtisan = async (id) => {
-    if (window.confirm('Are you sure you want to reject this artisan?')) {
-      try {
-        console.log('Rejecting artisan:', id);
-        await axios.delete(`http://localhost:5000/api/v1/admin/reject-artisan/${id}`);
-        toast.error('Artisan rejected ❌');
-        fetchAllArtisans();
-        fetchUnapprovedArtisans();
-      } catch (err) {
-        console.error('Reject artisan failed:', err.response?.status, err.response?.data);
-        toast.error('Error rejecting artisan');
-      }
-    }
   };
 
   return (
@@ -274,7 +186,7 @@ const AdminDashboard = ({ darkMode }) => {
       </div>
 
       {/* Stats Tab */}
-      {activeTab === 'stats' && <Stats stats={stats} loading={loading} />}
+      {activeTab === 'stats' && <Stats stats={stats} loading={false} />}
 
       {/* Pending Products */}
       {activeTab === 'pending-products' && (
