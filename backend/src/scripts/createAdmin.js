@@ -1,3 +1,4 @@
+//This file is for the purpose of creating the admin user role and it cannot be accesses by any person
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import User from '../models/User.js';
