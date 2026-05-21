@@ -23,6 +23,7 @@ const AdminDashboard = ({ darkMode }) => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
 
+  //This is fetching of all the artisans who created account
   const fetchAllArtisans = async () => {
     try {
       console.log('Fetching all artisans from: http://localhost:5000/api/v1/admin/artisans');
@@ -35,6 +36,7 @@ const AdminDashboard = ({ darkMode }) => {
     }
   };
 
+  //This code fetches all the products under the artisan who created the product
   const fetchAllProducts = async () => {
     try {
       console.log('Fetching all products...');
@@ -46,6 +48,7 @@ const AdminDashboard = ({ darkMode }) => {
     }
   };
 
+  //This code fetches statistics
   const fetchStats = async () => {
     try {
       console.log('Fetching admin stats...');
