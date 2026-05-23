@@ -6,7 +6,7 @@ const Footer = ({ user }) => {
     <footer className="bg-gray-900 text-white pt-16 pb-8">
       <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div id="about-us">
-          <h4 className="text-lg font-semibold mb-4">About Desi-Etsy</h4>
+          <h4 className="text-lg font-semibold mb-4">About My-fundi</h4>
           <p className="text-sm text-gray-400 mb-4">
             To empower Kenya's artisans by connecting them directly with clients for custom work, while simultaneously offering a curated marketplace where finished handcrafted products can be discovered and purchased.
           </p>
