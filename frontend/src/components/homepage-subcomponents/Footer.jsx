@@ -101,7 +101,7 @@ const Footer = ({ user }) => {
       </div>
 
       <div className="text-center text-gray-500 text-xs mt-12 pt-6 border-t border-gray-800">
-        <p>© {new Date().getFullYear()} Desi-Etsy. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} My-fundi. All rights reserved.</p>
       </div>
     </footer>
   );
