@@ -1,30 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import { FiUser, FiMail, FiShield, FiCalendar, FiEdit, FiSave, FiX, FiLogOut } from 'react-icons/fi';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import {
+  FiUser,
+  FiMail,
+  FiShield,
+  FiCalendar,
+  FiEdit,
+  FiSave,
+  FiX,
+  FiLogOut,
+} from "react-icons/fi";
 
 const ProfilePage = ({ darkMode }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ name: '', email: '' });
+  const [editForm, setEditForm] = useState({ name: "", email: "" });
   const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const storedUser = JSON.parse(localStorage.getItem('user'));
+        const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser) {
           // Fetch updated user data from backend
-          const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/profile`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          });
+          const res = await axios.get(
+            `${process.env.REACT_APP_API_URL}/auth/profile`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            },
+          );
           setUser(res.data);
         }
       } catch (err) {
-        toast.error('Failed to load profile');
+        toast.error("Failed to load profile");
         // Fallback to stored user data
-        setUser(JSON.parse(localStorage.getItem('user')));
+        setUser(JSON.parse(localStorage.getItem("user")));
       } finally {
         setLoading(false);
       }
@@ -35,10 +49,10 @@ const ProfilePage = ({ darkMode }) => {
 
   // Logout function
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    toast.success('Logged out successfully');
-    window.location.href = '/';
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    toast.success("Logged out successfully");
+    window.location.href = "/";
   };
 
   // Start editing profile
@@ -50,13 +64,13 @@ const ProfilePage = ({ darkMode }) => {
   // Cancel editing
   const handleCancelEdit = () => {
     setIsEditing(false);
-    setEditForm({ name: '', email: '' });
+    setEditForm({ name: "", email: "" });
   };
 
   // Save profile changes
   const handleSaveProfile = async () => {
     if (!editForm.name.trim() || !editForm.email.trim()) {
-      toast.error('Name and email are required');
+      toast.error("Name and email are required");
       return;
     }
 
@@ -66,16 +80,16 @@ const ProfilePage = ({ darkMode }) => {
         `${process.env.REACT_APP_API_URL}/auth/profile`,
         editForm,
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        }
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        },
       );
 
       setUser(res.data.user);
-      localStorage.setItem('user', JSON.stringify(res.data.user));
+      localStorage.setItem("user", JSON.stringify(res.data.user));
       setIsEditing(false);
-      toast.success('Profile updated successfully');
+      toast.success("Profile updated successfully");
     } catch (err) {
-      toast.error('Failed to update profile');
+      toast.error("Failed to update profile");
     } finally {
       setUpdating(false);
     }
@@ -83,7 +97,9 @@ const ProfilePage = ({ darkMode }) => {
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-800'} flex items-center justify-center`}>
+      <div
+        className={`min-h-screen ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-800"} flex items-center justify-center`}
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto"></div>
           <p className="mt-4">Loading profile...</p>
@@ -94,7 +110,9 @@ const ProfilePage = ({ darkMode }) => {
 
   if (!user) {
     return (
-      <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-800'} flex items-center justify-center`}>
+      <div
+        className={`min-h-screen ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-800"} flex items-center justify-center`}
+      >
         <div className="text-center">
           <FiUser size={48} className="mx-auto text-gray-400 mb-4" />
           <p>Please log in to view your profile</p>
@@ -104,9 +122,14 @@ const ProfilePage = ({ darkMode }) => {
   }
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-800'}`}>
+    <div
+      className={`min-h-screen ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-800"}`}
+    >
       <div className="max-w-4xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-8 text-center">👤 My Profile</h1>
+        <h1 className="text-3xl font-bold mb-8 text-center">
+          <FiUser className="inline w-6 h-6 mr-2" />
+          My Profile
+        </h1>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
           {/* Profile Header */}
@@ -117,13 +140,15 @@ const ProfilePage = ({ darkMode }) => {
             <div>
               <h2 className="text-2xl font-semibold">{user.name}</h2>
               <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
-              <span className={`inline-block px-3 py-1 text-sm rounded-full font-medium mt-2 ${
-                user.role === 'admin'
-                  ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                  : user.role === 'artisan'
-                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                  : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-              }`}>
+              <span
+                className={`inline-block px-3 py-1 text-sm rounded-full font-medium mt-2 ${
+                  user.role === "admin"
+                    ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                    : user.role === "artisan"
+                      ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                      : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                }`}
+              >
                 {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
               </span>
             </div>
@@ -135,12 +160,16 @@ const ProfilePage = ({ darkMode }) => {
               <div className="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <FiUser className="text-orange-500 mr-4" size={24} />
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Full Name</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Full Name
+                  </p>
                   {isEditing ? (
                     <input
                       type="text"
                       value={editForm.name}
-                      onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, name: e.target.value })
+                      }
                       className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
                       placeholder="Enter your name"
                     />
@@ -153,12 +182,16 @@ const ProfilePage = ({ darkMode }) => {
               <div className="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <FiMail className="text-orange-500 mr-4" size={24} />
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Email Address</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Email Address
+                  </p>
                   {isEditing ? (
                     <input
                       type="email"
                       value={editForm.email}
-                      onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, email: e.target.value })
+                      }
                       className="w-full mt-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
                       placeholder="Enter your email"
                     />
@@ -171,8 +204,12 @@ const ProfilePage = ({ darkMode }) => {
               <div className="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <FiShield className="text-orange-500 mr-4" size={24} />
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Account Type</p>
-                  <p className="font-semibold">{user.role.charAt(0).toUpperCase() + user.role.slice(1)}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Account Type
+                  </p>
+                  <p className="font-semibold">
+                    {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                  </p>
                 </div>
               </div>
             </div>
@@ -181,9 +218,13 @@ const ProfilePage = ({ darkMode }) => {
               <div className="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <FiCalendar className="text-orange-500 mr-4" size={24} />
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Member Since</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Member Since
+                  </p>
                   <p className="font-semibold">
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                    {user.createdAt
+                      ? new Date(user.createdAt).toLocaleDateString()
+                      : "N/A"}
                   </p>
                 </div>
               </div>
@@ -192,9 +233,13 @@ const ProfilePage = ({ darkMode }) => {
               <div className="flex items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <FiEdit className="text-orange-500 mr-4" size={24} />
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Last Updated</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Last Updated
+                  </p>
                   <p className="font-semibold">
-                    {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : 'N/A'}
+                    {user.updatedAt
+                      ? new Date(user.updatedAt).toLocaleDateString()
+                      : "N/A"}
                   </p>
                 </div>
               </div>
@@ -225,7 +270,7 @@ const ProfilePage = ({ darkMode }) => {
                   disabled={updating}
                   className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <FiSave /> {updating ? 'Saving...' : 'Save'}
+                  <FiSave /> {updating ? "Saving..." : "Save"}
                 </button>
                 <button
                   onClick={handleCancelEdit}
@@ -237,13 +282,13 @@ const ProfilePage = ({ darkMode }) => {
               </>
             )}
             <button
-              onClick={() => window.location.href = '/update-password'}
+              onClick={() => (window.location.href = "/update-password")}
               className="flex-1 bg-orange-600 hover:bg-orange-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
             >
               Update Password
             </button>
             <button
-              onClick={() => window.location.href = '/orders'}
+              onClick={() => (window.location.href = "/orders")}
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors"
             >
               View Orders

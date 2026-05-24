@@ -1,16 +1,25 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import ProductCard from './ProductCard';
+import React from "react";
+import { motion } from "framer-motion";
+import { FiDollarSign } from "react-icons/fi";
+import ProductCard from "./ProductCard";
 
-const SpecialDiscounts = ({ products, isInWishlist, onWishlistToggle, onAddToCart, onCategoryClick }) => {
-  const discountedProducts = products.filter(p => p.discountPercentage > 0).slice(0, 8);
+const SpecialDiscounts = ({
+  products,
+  isInWishlist,
+  onWishlistToggle,
+  onAddToCart,
+  onCategoryClick,
+}) => {
+  const discountedProducts = products
+    .filter((p) => p.discountPercentage > 0)
+    .slice(0, 8);
 
   if (discountedProducts.length === 0) return null;
 
   return (
     <div>
       <h3 className="text-2xl font-bold mb-6 text-center flex items-center justify-center gap-2">
-        <span className="text-red-600">💰</span> Special Discounts
+        <FiDollarSign className="text-red-600 w-6 h-6" /> Special Discounts
       </h3>
       <div className="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide">
         {discountedProducts.map((p, index) => (

@@ -12,6 +12,10 @@ import {
   FiMail,
   FiCheck,
   FiX,
+  FiLock,
+  FiLogOut,
+  FiImage,
+  FiEdit3,
 } from "react-icons/fi";
 import { FaBoxOpen } from "react-icons/fa";
 
@@ -69,15 +73,15 @@ const ArtisanProfile = ({ user }) => {
             <div className="py-1">
               <button
                 onClick={handleUpdatePassword}
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left flex items-center gap-2"
               >
-                🔐 Update Password
+                <FiLock className="w-4 h-4" /> Update Password
               </button>
               <button
                 onClick={handleLogout}
-                className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left flex items-center gap-2"
               >
-                🚪 Logout
+                <FiLogOut className="w-4 h-4" /> Logout
               </button>
             </div>
           </div>
@@ -319,7 +323,7 @@ const ArtisanDashboard = ({ darkMode }) => {
               htmlFor="image"
               className={`block mb-1 font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}
             >
-              🖼️ Image URL
+              <FiImage className="inline w-4 h-4 mr-2" /> Image URL
             </label>
             <input
               id="image"
@@ -336,7 +340,7 @@ const ArtisanDashboard = ({ darkMode }) => {
             htmlFor="description"
             className={`block mb-1 font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}
           >
-            📝 Description
+            <FiEdit3 className="inline w-4 h-4 mr-2" /> Description
           </label>
           <textarea
             id="description"

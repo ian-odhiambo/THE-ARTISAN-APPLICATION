@@ -102,7 +102,7 @@ const WishlistPage = () => {
                   onClick={() => handleShopNow(item)}
                   className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
                 >
-                  Shop Now 🛒
+                  <FiShoppingCart className="inline w-4 h-4 mr-2" /> Shop Now
                 </button>
                 <button
                   onClick={() => handleRemoveFromWishlist(item._id)}
