@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: chat-application
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm install --prefix frontend --include=dev && npm run build --prefix frontend
+    startCommand: node backend/src/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: SOCKET_IO_CORS_ORIGIN
+        sync: false

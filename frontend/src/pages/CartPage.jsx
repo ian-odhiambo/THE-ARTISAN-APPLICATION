@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { FiShoppingCart, FiHome, FiFileText } from 'react-icons/fi';
 import axios from 'axios';
 import { useCart } from '../context/CartContext';
 import { toast, ToastContainer } from 'react-toastify';
@@ -268,7 +269,7 @@ const CartPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
       <div className="max-w-6xl mx-auto bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold mb-4">🛒 Your Cart</h2>
+        <h2 className="text-2xl font-bold mb-4"><FiShoppingCart className="inline w-6 h-6 mr-2" />Your Cart</h2>
 
         {cartItems.length === 0 ? (
           <p className="text-gray-600 dark:text-gray-400">Your cart is empty.</p>
@@ -293,7 +294,7 @@ const CartPage = () => {
             <div className="w-full lg:w-1/3">
               {showDeliveryForm ? (
                 <div className="space-y-4 bg-gray-50 dark:bg-gray-800 p-4 rounded shadow-md">
-                  <h3 className="text-xl font-semibold">🏠 Delivery Address</h3>
+                  <h3 className="text-xl font-semibold"><FiHome className="inline w-5 h-5 mr-2" />Delivery Address</h3>
                   {[
                     { name: 'name', placeholder: 'Full Name' },
                     { name: 'phoneNumber', placeholder: 'M-Pesa Phone (2547xxxxxxxx)', type: 'tel' },
@@ -327,7 +328,7 @@ const CartPage = () => {
                 </div>
               ) : (
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded shadow-md">
-                  <h3 className="text-xl font-semibold mb-4">🧾 Order Summary</h3>
+                  <h3 className="text-xl font-semibold mb-4"><FiFileText className="inline w-5 h-5 mr-2" />Order Summary</h3>
                   <p>Total Items: {totalItems}</p>
                   <p>Total Price: KSH{totalPrice}</p>
 

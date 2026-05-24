@@ -1,20 +1,22 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { FiTruck } from 'react-icons/fi';
+import { FaPaintBrush, FaCheckCircle } from 'react-icons/fa';
 
 const WhyChooseUs = () => {
   const features = [
     {
-      icon: '🖌️',
+      icon: <FaPaintBrush className="w-10 h-10 mx-auto" />,
       title: 'Authentic Handmade',
       description: 'Every product is crafted with love by skilled Kenyan artisans'
     },
     {
-      icon: '🚚',
+      icon: <FiTruck className="w-10 h-10 mx-auto" />,
       title: 'Fast Delivery',
       description: 'Get your orders delivered quickly with our reliable partners'
     },
     {
-      icon: '💯',
+      icon: <FaCheckCircle className="w-10 h-10 mx-auto" />,
       title: 'Quality Guarantee',
       description: 'We ensure every product meets our high quality standards'
     }

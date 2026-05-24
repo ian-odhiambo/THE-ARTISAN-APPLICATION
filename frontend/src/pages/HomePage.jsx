@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useWishlist } from "../context/WishlistContext";
 import { useCart } from "../context/CartContext";
+import { FiStar } from 'react-icons/fi';
 
 import Navigation from "../components/homepage-subcomponents/Navigation";
 import WhoWeAre from "../components/homepage-subcomponents/WhoWeAre";
@@ -181,9 +182,7 @@ const HomePage = ({ darkMode, toggleDarkMode }) => {
       </div>
 
       <div id="product-grid" className="px-4 py-12 max-w-7xl mx-auto">
-        <h3 className="text-2xl font-bold mb-8 text-center">
-          ✨ Unique Products from our distinguished artisans  
-        </h3>
+        <h3 className="text-2xl font-bold mb-8 text-center"><FiStar className="inline w-5 h-5 text-yellow-400 mr-2" />Unique Products from our distinguished artisans</h3>
         <HandPickedForYou
           filteredProducts={filteredProducts}
           loading={loading}

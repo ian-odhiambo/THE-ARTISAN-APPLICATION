@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { FiStar } from 'react-icons/fi';
 import ProductCard from './ProductCard';
 
 const NewArrivals = ({ products, isInWishlist, onWishlistToggle, onAddToCart, onCategoryClick }) => {
@@ -10,7 +11,7 @@ const NewArrivals = ({ products, isInWishlist, onWishlistToggle, onAddToCart, on
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4">
       <h3 className="text-2xl font-bold mb-6 text-center flex items-center justify-center gap-2">
-        <span className="text-green-600">✨</span> New Arrivals
+        <FiStar className="text-green-600 w-5 h-5" /> New Arrivals
       </h3>
       <div className="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide">
         {newArrivals.map((p, index) => (
@@ -21,8 +22,8 @@ const NewArrivals = ({ products, isInWishlist, onWishlistToggle, onAddToCart, on
             transition={{ duration: 0.3, delay: index * 0.1 }}
           >
             <div className="relative">
-              <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
-                ✨ New
+              <span className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded z-20 flex items-center gap-1">
+                <FiStar className="w-3 h-3" /> New
               </span>
               <ProductCard
                 product={p}

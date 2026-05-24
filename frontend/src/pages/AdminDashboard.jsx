@@ -15,6 +15,8 @@ import {
   useArtisanActions,
   useClickOutside
 } from '../components/hooks';
+import { FiTool, FiBarChart2, FiUsers, FiClock } from 'react-icons/fi';
+import { FaBoxOpen } from 'react-icons/fa';
 
 const AdminDashboard = ({ darkMode }) => {
   const [activeTab, setActiveTab] = useState('stats');
@@ -127,7 +129,7 @@ const AdminDashboard = ({ darkMode }) => {
       </div>
 
       {/* Header */}
-      <h2 className="text-3xl font-bold text-orange-600 mb-2">🛠️ Admin Dashboard</h2>
+      <h2 className="text-3xl font-bold text-orange-600 mb-2"><FiTool className="inline w-6 h-6 mr-2" />Admin Dashboard</h2>
       <p className="mb-6 text-gray-600">Review and manage artisan products and accounts</p>
 
       {/* Tabs */}
@@ -140,7 +142,7 @@ const AdminDashboard = ({ darkMode }) => {
           }`}
           onClick={() => setActiveTab('stats')}
         >
-          📊
+          <FiBarChart2 className="inline w-4 h-4 mr-1" />
           <span className="ml-1">Stats</span>
         </button>
         <button
@@ -151,7 +153,7 @@ const AdminDashboard = ({ darkMode }) => {
           }`}
           onClick={() => setActiveTab('all-artisans')}
         >
-          👥 All Artisans ({allArtisans.length})
+          <FiUsers className="inline w-4 h-4 mr-1" /> All Artisans ({allArtisans.length})
         </button>
         <button
           className={`px-4 py-2 rounded font-medium transition-all ${
@@ -161,7 +163,7 @@ const AdminDashboard = ({ darkMode }) => {
           }`}
           onClick={() => setActiveTab('all-products')}
         >
-          📦 All Products ({allProducts.length})
+          <FaBoxOpen className="inline w-4 h-4 mr-1" /> All Products ({allProducts.length})
         </button>
         <button
           className={`px-4 py-2 rounded font-medium transition-all ${
@@ -171,7 +173,7 @@ const AdminDashboard = ({ darkMode }) => {
           }`}
           onClick={() => setActiveTab('pending-products')}
         >
-          ⏳ Pending Products ({products.length})
+          <FiClock className="inline w-4 h-4 mr-1" /> Pending Products ({products.length})
         </button>
         <button
           className={`px-4 py-2 rounded font-medium transition-all ${
@@ -181,7 +183,7 @@ const AdminDashboard = ({ darkMode }) => {
           }`}
           onClick={() => setActiveTab('pending-artisans')}
         >
-          ⏳ Pending Artisans ({unapprovedArtisans.length})
+          <FiClock className="inline w-4 h-4 mr-1" /> Pending Artisans ({unapprovedArtisans.length})
         </button>
       </div>
 
