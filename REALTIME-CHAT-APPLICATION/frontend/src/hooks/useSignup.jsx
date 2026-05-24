@@ -6,12 +6,19 @@ const useSignup = () => {
   const [loading, setLoading] = useState(false);
   const { setAuthUser } = useAuthContext();
 
-  const signup = async ({ fullName, username, password, confirmPassword }) => {
+  const signup = async ({
+    fullName,
+    username,
+    password,
+    confirmPassword,
+    role,
+  }) => {
     const success = handleInputErrors({
       fullName,
       username,
       password,
       confirmPassword,
+      role,
     });
     if (!success) return;
 
@@ -20,7 +27,13 @@ const useSignup = () => {
       const res = await fetch("/api/v1/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName, username, password, confirmPassword }),
+        body: JSON.stringify({
+          fullName,
+          username,
+          password,
+          confirmPassword,
+          role,
+        }),
       });
       const data = await res.json();
       if (data.error) {
@@ -42,9 +55,20 @@ const useSignup = () => {
 
 export default useSignup;
 
-function handleInputErrors({ fullName, username, password, confirmPassword }) {
+function handleInputErrors({
+  fullName,
+  username,
+  password,
+  confirmPassword,
+  role,
+}) {
   if (!fullName || !username || !password || !confirmPassword) {
     toast.error("All fields are required");
+    return false;
+  }
+
+  if (!role || !["customer", "artisan"].includes(role)) {
+    toast.error("Please select customer or artisan role.");
     return false;
   }
 

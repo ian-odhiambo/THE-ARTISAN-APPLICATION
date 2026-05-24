@@ -4,7 +4,13 @@ import generateTokenAndSetCookie from "../utils/generateToken.js";
 
 export const signUp = async (req, res) => {
   try {
-    const { fullName, username, password, confirmPassword } = req.body;
+    const {
+      fullName,
+      username,
+      password,
+      confirmPassword,
+      role = "customer",
+    } = req.body;
 
     if (password !== confirmPassword) {
       return res.status(400).json({ error: "Passwords don't match" });
@@ -14,6 +20,10 @@ export const signUp = async (req, res) => {
     if (user) {
       return res.status(400).json({ error: "Username already exists" });
     }
+    const normalizedRole = ["artisan", "customer"].includes(role)
+      ? role
+      : "customer";
+
     //Hashed passwords here
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -26,6 +36,7 @@ export const signUp = async (req, res) => {
       username,
       password: hashedPassword,
       profilePic,
+      role: normalizedRole,
     });
 
     if (newUser) {
@@ -38,6 +49,7 @@ export const signUp = async (req, res) => {
         fullName: newUser.fullName,
         username: newUser.username,
         profilePic: newUser.profilePic,
+        role: newUser.role,
       });
     } else {
       res.status(400).json({ error: "Invalid user data" });
@@ -81,6 +93,7 @@ export const login = async (req, res) => {
       fullName: user.fullName,
       username: user.username,
       profilePic: user.profilePic,
+      role: user.role || "customer",
     });
   } catch (error) {
     console.log("Error in Login controller", error.message);
@@ -90,12 +103,15 @@ export const login = async (req, res) => {
 
 export const syncUser = async (req, res) => {
   try {
-    const { fullName, username, password } = req.body;
+    const { fullName, username, password, role = "customer" } = req.body;
 
     if (!fullName || !username || !password) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    const normalizedRole = ["artisan", "customer"].includes(role)
+      ? role
+      : "customer";
     const existingUser = await User.findOne({ username });
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -105,6 +121,7 @@ export const syncUser = async (req, res) => {
       existingUser.fullName = fullName;
       existingUser.password = hashedPassword;
       existingUser.profilePic = profilePic;
+      existingUser.role = existingUser.role || normalizedRole;
       await existingUser.save();
       return res.status(200).json({ message: "Chat user synced" });
     }
@@ -114,6 +131,7 @@ export const syncUser = async (req, res) => {
       username,
       password: hashedPassword,
       profilePic,
+      role: normalizedRole,
     });
 
     await newUser.save();

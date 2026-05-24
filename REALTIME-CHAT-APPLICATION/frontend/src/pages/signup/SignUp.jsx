@@ -7,6 +7,7 @@ const SignUp = () => {
     username: "",
     password: "",
     confirmPassword: "",
+    role: "customer",
   });
 
   const { loading, signup } = useSignup();
@@ -80,6 +81,34 @@ const SignUp = () => {
                 setInput({ ...input, confirmPassword: e.target.value })
               }
             />
+          </div>
+
+          <div className="mt-3">
+            <span className="text-base label-text">I am a</span>
+            <div className="flex gap-4 mt-2">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="role"
+                  value="customer"
+                  checked={input.role === "customer"}
+                  onChange={(e) => setInput({ ...input, role: e.target.value })}
+                  className="radio"
+                />
+                <span>Customer</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="role"
+                  value="artisan"
+                  checked={input.role === "artisan"}
+                  onChange={(e) => setInput({ ...input, role: e.target.value })}
+                  className="radio"
+                />
+                <span>Artisan</span>
+              </label>
+            </div>
           </div>
 
           <Link
