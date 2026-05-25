@@ -6,9 +6,14 @@ export const getUsersforSidebar = async (req, res) => {
     const currentUserRole = req.user.role || "customer";
     const oppositeRole = currentUserRole === "artisan" ? "customer" : "artisan";
 
+    const roleQuery =
+      oppositeRole === "customer"
+        ? { $or: [{ role: "customer" }, { role: { $exists: false } }] }
+        : { role: "artisan" };
+
     const filteredUsers = await User.find({
       _id: { $ne: loggedInUserId },
-      role: oppositeRole,
+      ...roleQuery,
     }).select("-password");
 
     res.status(200).json(filteredUsers);
