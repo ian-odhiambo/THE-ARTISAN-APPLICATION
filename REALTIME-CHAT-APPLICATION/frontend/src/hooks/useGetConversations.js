@@ -12,12 +12,34 @@ const useGetConversations = () => {
     const getConversation = async () => {
       setLoading(true);
       try {
-        const res = await fetch("/api/v1/users", { credentials: "include" });
-        const data = await res.json();
-        if (data.error) {
+        const backend = import.meta.env.VITE_API_URL || "http://localhost:8000";
+        const url = `${backend}/api/v1/users`;
+        console.log("[useGetConversations] fetching", url);
+        const res = await fetch(url, { credentials: "include" });
+        console.log("[useGetConversations] response status:", res.status);
+
+        let data;
+        try {
+          data = await res.json();
+        } catch (e) {
+          const text = await res.text();
+          console.log("[useGetConversations] non-JSON response body:", text);
+          throw new Error(text || "Failed to parse response");
+        }
+
+        console.log("[useGetConversations] response body:", data);
+        if (data?.error) {
           throw new Error(data.error);
         }
-        setConversations(filterOppositeRole(data, authUser));
+        const filtered = filterOppositeRole(data, authUser);
+        console.log("[useGetConversations] authUser role:", authUser?.role);
+        console.log("[useGetConversations] authUser full:", authUser);
+
+        console.log("[useGetConversations] received users count:", Array.isArray(data) ? data.length : data);
+        console.log("[useGetConversations] filtered users count:", filtered?.length);
+        setConversations(filtered);
+
+
       } catch (error) {
         toast.error(error.message);
       } finally {

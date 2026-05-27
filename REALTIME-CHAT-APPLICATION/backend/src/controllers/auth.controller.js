@@ -128,7 +128,8 @@ export const syncUser = async (req, res) => {
       existingUser.fullName = fullName;
       existingUser.password = hashedPassword;
       existingUser.profilePic = profilePic;
-      existingUser.role = existingUser.role || normalizedRole;
+      // Keep the chat user's role aligned with the ecommerce role on every sync/login.
+      existingUser.role = normalizedRole;
       await existingUser.save();
       return res.status(200).json({ message: "Chat user synced" });
     }

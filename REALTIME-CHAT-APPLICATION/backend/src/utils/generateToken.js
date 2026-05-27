@@ -8,9 +8,11 @@ const generateTokenAndSetCookie = (userId, res) => {
     res.cookie('jwt', token,{
         maxAge: 15 * 24* 60* 1000, //MS
         httpOnly: true, //ths prevents XSS attacks cross-site scripting attacks
-        sameSite:"strict", //CSRF attacks cross-site requests forgery attacks
-        secure: process.env.NODE_ENV !== "development"
+        sameSite:"lax", // allow cookie sharing across localhost ports
+
+        secure: false, // allow cookie over http://localhost
     });
 };
+
 
 export default generateTokenAndSetCookie;

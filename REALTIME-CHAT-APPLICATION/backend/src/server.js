@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import path from "path"
 
+import { corsMiddleware } from "./middleware/cors.js";
+
 //routes
 import authRoutes from "./routes/v1/auth.routes.js";
 import messageRoutes from "./routes/v1/message.routes.js";
@@ -22,7 +24,7 @@ const __dirname = path.resolve();
 
 app.use(express.json()); // allows us to parse incoming requests:req.body
 app.use(cookieParser());
-
+app.use(corsMiddleware);
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/message", messageRoutes);
@@ -37,3 +39,4 @@ server.listen(PORT, () => {
   connectToMongoDB();
   console.log(`Server Running on port ${PORT}`);
 });
+
