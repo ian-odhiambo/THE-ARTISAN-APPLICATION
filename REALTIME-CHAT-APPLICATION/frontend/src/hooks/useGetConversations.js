@@ -31,13 +31,11 @@ const useGetConversations = () => {
         if (data?.error) {
           throw new Error(data.error);
         }
-        const filtered = filterOppositeRole(data, authUser);
-        console.log("[useGetConversations] authUser role:", authUser?.role);
-        console.log("[useGetConversations] authUser full:", authUser);
-
+        // Backend already filters the opposite role based on the authenticated user.
+        // Avoid client-side re-filtering because authUser state can be stale.
         console.log("[useGetConversations] received users count:", Array.isArray(data) ? data.length : data);
-        console.log("[useGetConversations] filtered users count:", filtered?.length);
-        setConversations(filtered);
+        setConversations(data);
+
 
 
       } catch (error) {
@@ -53,11 +51,5 @@ const useGetConversations = () => {
   return { loading, conversations };
 };
 
-function filterOppositeRole(users, authUser) {
-  if (!users?.length) return users;
-  const role = authUser?.role || "customer";
-  const oppositeRole = role === "artisan" ? "customer" : "artisan";
-  return users.filter((user) => user.role === oppositeRole);
-}
-
 export default useGetConversations;
+
