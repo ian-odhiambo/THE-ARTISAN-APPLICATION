@@ -11,6 +11,8 @@ const TopSellers = ({
   onCategoryClick,
 }) => {
   const topSellers = products.filter((p) => p.isTopSeller).slice(0, 8);
+  const displayedSellers =
+    topSellers.length > 0 ? topSellers : products.slice(0, 8);
   const carouselRef = useRef(null);
   const selectedRefs = useRef({});
   const [isPaused, setIsPaused] = useState(false);
@@ -39,7 +41,8 @@ const TopSellers = ({
     selectedEl?.scrollIntoView({ behavior: "smooth", inline: "center" });
   }, [selectedProductId]);
 
-  if (topSellers.length === 0) return null;
+  // show fallback products if none are explicitly marked as top sellers
+  if (displayedSellers.length === 0) return null;
 
   return (
     <div className="pb-4">
@@ -53,7 +56,7 @@ const TopSellers = ({
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        {topSellers.map((p, index) => (
+        {displayedSellers.map((p, index) => (
           <motion.div
             key={p._id}
             ref={(el) => {
