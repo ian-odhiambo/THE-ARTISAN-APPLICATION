@@ -113,6 +113,9 @@ const ProductCard = React.memo(
                   ({product.reviews || 24})
                 </span>
               </div>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-3">
+                {product.description || "Description unavailable."}
+              </p>
 
               <div className="flex justify-between items-center mt-3">
                 {product.discountPercentage > 0 ? (
@@ -130,7 +133,7 @@ const ProductCard = React.memo(
                   </span>
                 )}
                 <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                  <FiTruck className="mr-1" /> Free delivery
+                  <FiTruck className="mr-1" /> Delivery? we&apos;ve got you
                 </span>
               </div>
             </div>

@@ -33,7 +33,7 @@ console.log("Server started with key:", global.serverKey);
 // CORS setup
 if (process.env.NODE !== "production") {
   const allowedOrigins = process.env.CORS_ORIGINS
-    ? process.env.CORS_ORIGINS.split(",")
+    ? process.env.NODE_ENV .split(",")
     : ["http://localhost:5173", "http://localhost:5174"];
   app.use(
     cors({

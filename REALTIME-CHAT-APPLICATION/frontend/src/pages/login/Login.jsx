@@ -1,18 +1,19 @@
-import {useState} from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import useLogin from "../../hooks/useLogin.jsx";
 
 const login = () => {
-    const[username, setUsername] = useState("");
-    const[password, setPassword] = useState("");
-    
-    const {loading, login} = useLogin();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("customer");
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        // useLogin expects: login(username, password)
-        await login(username.trim(), password);
-    }
+  const { loading, login } = useLogin();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // useLogin now accepts: login(username, password, role)
+    await login(username.trim(), password, role);
+  };
   return (
     <div className="flex flex-col items-center justify-center min-w-96 mx-auto">
       <div className="w-full p-6 rounded-lg  shadow-md bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-0 ">
@@ -22,7 +23,7 @@ const login = () => {
           <span className="text-blue-500"> ChatApp</span>
         </h1>
 
-        <form onSubmit = {handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <div>
             <label className="label p-2">
               <span className="text-base label-text">Username</span>
@@ -44,9 +45,39 @@ const login = () => {
               type="password"
               placeholder="Enter password"
               className="w-full input input-bordered h-10"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
+          </div>
+
+          <div className="mt-4">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+              Login as
+            </p>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="role"
+                  value="customer"
+                  checked={role === "customer"}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="radio radio-primary"
+                />
+                <span>Customer</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="role"
+                  value="artisan"
+                  checked={role === "artisan"}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="radio radio-primary"
+                />
+                <span>Artisan</span>
+              </label>
+            </div>
           </div>
 
           <Link
@@ -56,10 +87,14 @@ const login = () => {
             {"Don't"} have an account?
           </Link>
           <div>
-            <button className="btn btn-block btn-sm mt-2"
-            disabled={loading}
-            >
-             {loading ? <><span className="loading loading-spinner"></span></> : "Login"}   
+            <button className="btn btn-block btn-sm mt-2" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="loading loading-spinner"></span>
+                </>
+              ) : (
+                "Login"
+              )}
             </button>
           </div>
         </form>

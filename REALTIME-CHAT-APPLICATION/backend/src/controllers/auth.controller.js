@@ -62,15 +62,16 @@ export const signUp = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    let { username, password } = req.body;
+    let { username, password, role } = req.body;
     username = typeof username === "string" ? username.trim() : username;
+    role = typeof role === "string" ? role.trim().toLowerCase() : role;
 
     console.log("[LOGIN] received username:", username);
     console.log(
       "[LOGIN] received password length:",
       typeof password === "string" ? password.length : "not-a-string",
     );
-    console.log("[LOGIN] is username string:", typeof username === "string");
+    console.log("[LOGIN] received role:", role);
 
     const user = await User.findOne({ username });
     console.log("[LOGIN] user found:", !!user);
@@ -84,6 +85,12 @@ export const login = async (req, res) => {
 
     if (!user || !isPasswordCorrect) {
       return res.status(400).json({ error: "Invalid username or password" });
+    }
+
+    if (role && ["customer", "artisan"].includes(role) && role !== user.role) {
+      return res.status(400).json({
+        error: `Role mismatch: this account is registered as ${user.role}. Please login with the correct role.`,
+      });
     }
 
     generateTokenAndSetCookie(user._id, res);

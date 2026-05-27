@@ -1,37 +1,78 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import ProductCard from './ProductCard';
+import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { FiAward } from "react-icons/fi";
+import ProductCard from "./ProductCard";
 
-const TopSellers = ({ products, isInWishlist, onWishlistToggle, onAddToCart, onCategoryClick }) => {
-  const topSellers = products.filter(p => p.isTopSeller).slice(0, 8);
+const TopSellers = ({
+  products,
+  isInWishlist,
+  onWishlistToggle,
+  onAddToCart,
+  onCategoryClick,
+}) => {
+  const topSellers = products.filter((p) => p.isTopSeller).slice(0, 8);
+  const carouselRef = useRef(null);
+  const selectedRefs = useRef({});
+  const [isPaused, setIsPaused] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+
+  useEffect(() => {
+    if (!carouselRef.current || isPaused) return;
+
+    const node = carouselRef.current;
+    const intervalId = window.setInterval(() => {
+      if (!node) return;
+      const maxScroll = node.scrollWidth - node.clientWidth;
+      if (node.scrollLeft >= maxScroll - 1) {
+        node.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        node.scrollBy({ left: 320, behavior: "smooth" });
+      }
+    }, 3200);
+
+    return () => window.clearInterval(intervalId);
+  }, [isPaused, topSellers.length]);
+
+  useEffect(() => {
+    if (!selectedProductId) return;
+    const selectedEl = selectedRefs.current[selectedProductId];
+    selectedEl?.scrollIntoView({ behavior: "smooth", inline: "center" });
+  }, [selectedProductId]);
 
   if (topSellers.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4">
-      <h3 className="text-2xl font-bold mb-6 text-center flex items-center justify-center gap-2">
-        <span className="text-orange-600">🏆</span> Top Sellers
-      </h3>
-      <div className="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide">
+    <div className="pb-4">
+      <div className="text-center mb-6">
+        <FiAward className="mx-auto w-10 h-10 text-orange-500 mb-2" />
+        <h3 className="text-2xl font-bold">Top Sellers</h3>
+      </div>
+      <div
+        ref={carouselRef}
+        className="flex overflow-x-auto space-x-6 pb-4 scrollbar-hide scroll-smooth"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
         {topSellers.map((p, index) => (
           <motion.div
             key={p._id}
+            ref={(el) => {
+              if (el) selectedRefs.current[p._id] = el;
+            }}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
+            className="flex-shrink-0"
+            onMouseEnter={() => setSelectedProductId(p._id)}
+            onClick={() => setIsPaused(true)}
           >
-            <div className="relative">
-              <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded z-20">
-                🏆 Featured artisanry
-              </span>
-              <ProductCard
-                product={p}
-                isInWishlist={isInWishlist(p._id)}
-                onWishlistToggle={onWishlistToggle}
-                onAddToCart={onAddToCart}
-                onCategoryClick={onCategoryClick}
-              />
-            </div>
+            <ProductCard
+              product={p}
+              isInWishlist={isInWishlist(p._id)}
+              onWishlistToggle={onWishlistToggle}
+              onAddToCart={onAddToCart}
+              onCategoryClick={onCategoryClick}
+            />
           </motion.div>
         ))}
       </div>

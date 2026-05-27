@@ -6,8 +6,8 @@ const useLogin = () => {
   const [loading, setLoading] = useState(false);
   const { setAuthUser } = useAuthContext(true);
 
-  const login = async (username, password) => {
-    const success = handleInputErrors({ username, password });
+  const login = async (username, password, role = "customer") => {
+    const success = handleInputErrors({ username, password, role });
     if (!success) return;
 
     setLoading(true);
@@ -15,12 +15,13 @@ const useLogin = () => {
       console.log("[useLogin] sending:", {
         username,
         passwordLength: password?.length,
+        role,
       });
 
       const res = await fetch("/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, role }),
       });
 
       let data = null;
@@ -34,7 +35,9 @@ const useLogin = () => {
       console.log("[useLogin] response body:", data);
 
       if (!res.ok) {
-        throw new Error(data?.error || `Request failed with status ${res.status}`);
+        throw new Error(
+          data?.error || `Request failed with status ${res.status}`,
+        );
       }
 
       if (data?.error) {
@@ -55,12 +58,15 @@ const useLogin = () => {
 
 export default useLogin;
 
-function handleInputErrors({ username, password }) {
+function handleInputErrors({ username, password, role }) {
   if (!username || !password) {
     toast.error("Please fill in all fields");
+    return false;
+  }
+  if (!role || !["customer", "artisan"].includes(role)) {
+    toast.error("Please select a valid role");
     return false;
   }
 
   return true;
 }
-
