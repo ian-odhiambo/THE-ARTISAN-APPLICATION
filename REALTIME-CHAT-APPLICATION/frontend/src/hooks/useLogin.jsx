@@ -4,6 +4,7 @@ import { useAuthContext } from "../context/AuthContext.jsx";
 
 const useLogin = () => {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const { setAuthUser } = useAuthContext(true);
 
   const login = async (username, password, role = "customer") => {
@@ -35,17 +36,19 @@ const useLogin = () => {
       console.log("[useLogin] response body:", data);
 
       if (!res.ok) {
-        throw new Error(
-          data?.error || `Request failed with status ${res.status}`,
-        );
+        const msg = data?.error || `Request failed with status ${res.status}`;
+        setError(msg);
+        throw new Error(msg);
       }
 
       if (data?.error) {
+        setError(data.error);
         throw new Error(data.error);
       }
 
       localStorage.setItem("authUser", JSON.stringify(data));
       setAuthUser(data);
+      setError(null);
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -53,7 +56,7 @@ const useLogin = () => {
     }
   };
 
-  return { loading, login };
+  return { loading, login, error };
 };
 
 export default useLogin;

@@ -7,7 +7,7 @@ const login = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("customer");
 
-  const { loading, login } = useLogin();
+  const { loading, login, error } = useLogin();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,6 +22,10 @@ const login = () => {
           Login
           <span className="text-blue-500"> ChatApp</span>
         </h1>
+        <div className="text-sm text-center text-gray-200 mt-2">
+          Logging in as:{" "}
+          <span className="font-semibold capitalize">{role}</span>
+        </div>
 
         <form onSubmit={handleSubmit}>
           <div>
@@ -97,6 +101,11 @@ const login = () => {
               )}
             </button>
           </div>
+          {error && (
+            <div className="text-red-500 text-sm mt-3" role="alert">
+              {error}
+            </div>
+          )}
         </form>
       </div>
     </div>
