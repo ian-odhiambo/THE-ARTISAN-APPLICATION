@@ -110,7 +110,17 @@ export const login = async (req, res) => {
 
 export const syncUser = async (req, res) => {
   try {
-    const { fullName, username, password, role = "customer" } = req.body;
+    const { fullName, username, password, role } = req.body;
+
+    // If role is missing, we should not silently fall back to customer,
+    // otherwise all synced users will end up as customers.
+    if (!role) {
+      return res.status(400).json({ error: "Missing role in sync payload" });
+    }
+
+    console.log("[syncUser] incoming role:", req.body?.role);
+
+
 
     if (!fullName || !username || !password) {
       return res.status(400).json({ error: "Missing required fields" });

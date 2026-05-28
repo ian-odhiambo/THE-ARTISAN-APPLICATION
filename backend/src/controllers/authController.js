@@ -28,6 +28,38 @@ export const getUsers = async (req, res) => {
   }
 };
 
+// Chat sync helper
+const getChatAppUrl = () => {
+  return process.env.CHAT_APP_URL || "http://localhost:8001";
+};
+
+const syncUserWithChatApp = async (fullName, username, password, role) => {
+  if (!fullName || !username) {
+    throw new Error("Missing required chat sync fields");
+  }
+
+  const chatAppUrl = getChatAppUrl();
+
+  // Chat app schema supports only: customer | artisan
+  const normalizedChatRole = ["artisan", "customer"].includes(role)
+    ? role
+    : "customer";
+
+  await axios.post(
+    `${chatAppUrl}/api/v1/auth/sync-user`,
+    {
+      fullName,
+      username,
+      password,
+      role: normalizedChatRole,
+    },
+    {
+      headers: { "Content-Type": "application/json" },
+      timeout: 5000,
+    },
+  );
+};
+
 // Register Controller
 export const register = async (req, res) => {
   try {
@@ -76,7 +108,7 @@ export const register = async (req, res) => {
       mongoose.connection.readyState,
     );
 
-    await syncUserWithChatApp(name, email, password).catch((syncErr) => {
+    await syncUserWithChatApp(name, email, password, role).catch((syncErr) => {
       console.warn("[AuthController] Chat sync failed:", syncErr.message);
     });
 
@@ -99,8 +131,7 @@ export const login = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     const token = jwt.sign(
       { id: user._id, role: user.role, serverKey: global.serverKey },
@@ -110,7 +141,7 @@ export const login = async (req, res) => {
 
     console.log("[AuthController] User logged in:", user._id);
 
-    await syncUserWithChatApp(user.name, user.email, password).catch(
+    await syncUserWithChatApp(user.name, user.email, password, user.role).catch(
       (syncErr) => {
         console.warn(
           "[AuthController] Chat sync failed on login:",
@@ -142,10 +173,11 @@ export const forgotPassword = async (req, res) => {
 
     const { email } = req.body;
     const user = await User.findOne({ email });
-    if (!user)
+    if (!user) {
       return res
         .status(200)
         .json({ message: "If this email exists, a reset link has been sent." });
+    }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "10m",
@@ -236,31 +268,6 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-// Chat sync helper
-const getChatAppUrl = () => {
-  return process.env.CHAT_APP_URL || "http://localhost:8001";
-};
-
-const syncUserWithChatApp = async (fullName, username, password) => {
-  if (!fullName || !username) {
-    throw new Error("Missing required chat sync fields");
-  }
-
-  const chatAppUrl = getChatAppUrl();
-  await axios.post(
-    `${chatAppUrl}/api/v1/auth/sync-user`,
-    {
-      fullName,
-      username,
-      password,
-    },
-    {
-      headers: { "Content-Type": "application/json" },
-      timeout: 5000,
-    },
-  );
-};
-
 export const updatePassword = async (req, res) => {
   try {
     console.log("[AuthController] Update password for:", req.user.id);
@@ -270,8 +277,7 @@ export const updatePassword = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Old password is incorrect" });
+    if (!isMatch) return res.status(400).json({ message: "Old password is incorrect" });
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
@@ -295,3 +301,4 @@ export default {
   updatePassword,
   getUsers, // temp debug
 };
+
