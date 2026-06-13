@@ -36,7 +36,8 @@ const AllProducts = ({ products, onApprove, onReject }) => {
               <h4 className="font-bold text-lg line-clamp-1 mb-1">{p.title}</h4>
               <p className="text-sm text-gray-600 mb-1">{p.category}</p>
               <p className="text-lg font-semibold text-orange-600 mb-2">
-                ₹{p.price}
+                KSh {p.price}
+
               </p>
               <p className="text-sm text-gray-500 mb-3">
                 Artisan: {p.artisanId?.name || "N/A"}

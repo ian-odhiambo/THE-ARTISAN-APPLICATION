@@ -96,7 +96,8 @@ const MyOrdersPage = ({ darkMode }) => {
               <span><strong>Date:</strong> {order.placedAt ? new Date(order.placedAt).toLocaleDateString() : 'N/A'}</span>
             </div>
 
-            <p className="text-gray-800 dark:text-gray-100"><strong>Total:</strong> ₹{order.total}</p>
+            <p className="text-gray-800 dark:text-gray-100"><strong>Total:</strong> KSh {order.total}</p>
+
             <p className="text-gray-800 dark:text-gray-100"><strong>Payment:</strong> {order.paymentStatus}</p>
 
             <p className="mt-2">

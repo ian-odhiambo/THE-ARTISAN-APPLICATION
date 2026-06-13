@@ -82,10 +82,10 @@ const WishlistPage = () => {
               {item.discountPercentage > 0 ? (
                 <div className="my-2">
                   <span className="text-gray-500 dark:text-gray-400 line-through text-sm">
-                    ₹{item.originalPrice}
+                    KSh {item.originalPrice}
                   </span>
                   <span className="text-red-600 font-bold text-lg ml-2">
-                    ₹{item.price}
+                    KSh {item.price}
                   </span>
                   <span className="text-green-600 text-sm font-medium ml-1">
                     ({item.discountPercentage}% OFF)
@@ -93,7 +93,7 @@ const WishlistPage = () => {
                 </div>
               ) : (
                 <p className="text-gray-800 dark:text-gray-100 font-bold my-2">
-                  ₹{item.price}
+                  KSh {item.price}
                 </p>
               )}
 

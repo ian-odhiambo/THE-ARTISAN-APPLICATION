@@ -289,7 +289,7 @@ const ArtisanDashboard = ({ darkMode }) => {
               htmlFor="price"
               className={`block mb-1 font-medium ${darkMode ? "text-gray-300" : "text-gray-700"}`}
             >
-              <FiDollarSign className="inline w-4 h-4 mr-2" /> Price (₹)
+              <FiDollarSign className="inline w-4 h-4 mr-2" /> Price (KSh)
             </label>
             <input
               id="price"
@@ -424,7 +424,7 @@ const ArtisanDashboard = ({ darkMode }) => {
                 <strong>Customer:</strong> {order.user?.name || "Unknown"}
               </p>
               <p>
-                <strong>Total:</strong> ₹{order.total}
+                <strong>Total:</strong> KSh {order.total}
               </p>
               <p>
                 <strong>Status:</strong> {order.status}
